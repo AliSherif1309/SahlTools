@@ -238,6 +238,10 @@ class MainActivity : Activity() {
         add(R.string.save_t, R.string.save_d, R.drawable.ic_save)
         add(R.string.wifi_t, R.string.wifi_d, R.drawable.ic_wifi,
             R.string.open to { startActivity(Intent(this, WifiActivity::class.java)) })
+        add(R.string.wpass_t, R.string.wpass_d, R.drawable.ic_wifi,
+            R.string.open to { startActivity(Intent(this, WifiPassActivity::class.java)) })
+        add(R.string.deeplink_t, R.string.deeplink_d, R.drawable.ic_link,
+            R.string.open to { startActivity(Intent(this, DeepLinkActivity::class.java)) })
         add(R.string.speed_t, R.string.speed_d, R.drawable.ic_speed,
             R.string.open to { startActivity(Intent(this, SpeedActivity::class.java)) })
         add(R.string.data_t, R.string.data_d, R.drawable.ic_data,

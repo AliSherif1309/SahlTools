@@ -197,4 +197,42 @@
     <string name="light_t">ضوء الشاشة</string>
     <string name="light_d">يحوّل الشاشة كلها إلى ضوء ساطع ناعم. اضغط للتبديل بين الأبيض والدافئ والأحمر الليلي.</string>
     <string name="light_hint">اضغط لتغيير اللون · رجوع للإغلاق</string>
+    <string name="wpass_t">كلمات مرور الواي فاي وQR</string>
+    <string name="wpass_d">اعرض كلمات مرور شبكات الواي فاي المحفوظة على هذا الهاتف وشارك أيًا منها كرمز QR.</string>
+    <string name="wpass_manual">إنشاء رمز QR لشبكة واي فاي</string>
+    <string name="wpass_name">اسم الشبكة (SSID)</string>
+    <string name="wpass_password">كلمة المرور (فارغة = شبكة مفتوحة)</string>
+    <string name="wpass_make_qr">عرض رمز QR</string>
+    <string name="wpass_need_shizuku">لعرض كلمات المرور المحفوظة يتطلب أندرويد تطبيق Shizuku (موجود على هاتفك). افتح Shizuku وشغّله ثم ارجع.</string>
+    <string name="wpass_open_shizuku">افتح Shizuku</string>
+    <string name="wpass_allow_shizuku">Shizuku يعمل. اسمح لسهل للأدوات باستخدامه لقراءة كلمات مرور الواي فاي.</string>
+    <string name="wpass_allow">سماح</string>
+    <string name="wpass_saved">الشبكات المحفوظة</string>
+    <string name="wpass_search">ابحث في الشبكات…</string>
+    <string name="wpass_failed">تعذّرت قراءة الشبكات المحفوظة.</string>
+    <string name="wpass_none">لا توجد شبكات محفوظة</string>
+    <string name="wpass_open">شبكة مفتوحة — بدون كلمة مرور</string>
+    <string name="wpass_eap">شبكة عمل/مؤسسة — كلمة المرور غير محفوظة كنص</string>
+    <string name="wpass_tap_show">اضغط للعرض</string>
+    <string name="wpass_qr">رمز QR</string>
+    <string name="wpass_share_text">الواي فاي: %1$s
+كلمة المرور: %2$s</string>
+    <string name="wpass_scan_hint">امسحه بكاميرا أي هاتف للاتصال</string>
+    <string name="deeplink_t">فاتح الروابط العميقة</string>
+    <string name="deeplink_d">افتح أي عنوان تطبيق — tel: وواتساب ومتجر Play والخرائط وروابط intent: — واختر التطبيق الذي يفتحه.</string>
+    <string name="dl_hint">اكتب أو الصق رابطًا، مثل whatsapp://send?phone=974…</string>
+    <string name="dl_find">ابحث عن التطبيقات</string>
+    <string name="dl_recent">الأخيرة</string>
+    <string name="dl_examples">أمثلة</string>
+    <string name="dl_bad">هذا ليس رابطًا صالحًا</string>
+    <string name="dl_scheme">النوع: %1$s · اضغط على تطبيق لفتحه</string>
+    <string name="dl_no_app">لا يوجد تطبيق يدعم فتح هذا. يمكنك المحاولة رغم ذلك.</string>
+    <string name="dl_try">حاول الفتح على أي حال</string>
+    <string name="dl_failed">تعذّر الفتح:</string>
+    <string name="dl_ex_wa">محادثة واتساب مع رقم</string>
+    <string name="dl_ex_tel">لوحة الاتصال</string>
+    <string name="dl_ex_store">صفحة في متجر Play</string>
+    <string name="dl_ex_map">موقع على الخريطة (الدوحة)</string>
+    <string name="dl_ex_mail">بريد جديد</string>
+    <string name="dl_ex_dev">شاشة خيارات المطوّر</string>
 </resources>

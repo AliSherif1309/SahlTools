@@ -197,4 +197,42 @@
     <string name="light_t">Screen Light</string>
     <string name="light_d">Turns the whole screen into a bright soft light. Tap to switch white, warm or night-red.</string>
     <string name="light_hint">Tap to change colour · back to close</string>
+    <string name="wpass_t">Wi-Fi Passwords &amp; QR</string>
+    <string name="wpass_d">See the passwords of Wi-Fi networks saved on this phone and share any of them as a QR code.</string>
+    <string name="wpass_manual">Make a Wi-Fi QR code</string>
+    <string name="wpass_name">Network name (SSID)</string>
+    <string name="wpass_password">Password (empty = open network)</string>
+    <string name="wpass_make_qr">Show QR code</string>
+    <string name="wpass_need_shizuku">To list saved passwords, Android requires Shizuku (already on your phone). Open Shizuku and start it, then come back.</string>
+    <string name="wpass_open_shizuku">Open Shizuku</string>
+    <string name="wpass_allow_shizuku">Shizuku is running. Allow Sahl Tools to use it to read saved Wi-Fi passwords.</string>
+    <string name="wpass_allow">Allow</string>
+    <string name="wpass_saved">Saved networks</string>
+    <string name="wpass_search">Search networks…</string>
+    <string name="wpass_failed">Could not read saved networks.</string>
+    <string name="wpass_none">No saved networks found</string>
+    <string name="wpass_open">Open network — no password</string>
+    <string name="wpass_eap">Work/enterprise network — password not stored as text</string>
+    <string name="wpass_tap_show">tap to show</string>
+    <string name="wpass_qr">QR code</string>
+    <string name="wpass_share_text">Wi-Fi: %1$s
+Password: %2$s</string>
+    <string name="wpass_scan_hint">Scan with any phone camera to join</string>
+    <string name="deeplink_t">Deep-Link Opener</string>
+    <string name="deeplink_d">Open any app address — tel:, WhatsApp, Play Store, maps, intent: links — and choose which app opens it.</string>
+    <string name="dl_hint">Type or paste a link, e.g. whatsapp://send?phone=974…</string>
+    <string name="dl_find">Find apps</string>
+    <string name="dl_recent">Recent</string>
+    <string name="dl_examples">Examples</string>
+    <string name="dl_bad">That isn\'t a valid link</string>
+    <string name="dl_scheme">Type: %1$s · tap an app to open</string>
+    <string name="dl_no_app">No app says it can open this. You can still try.</string>
+    <string name="dl_try">Try to open anyway</string>
+    <string name="dl_failed">Could not open:</string>
+    <string name="dl_ex_wa">WhatsApp chat with a number</string>
+    <string name="dl_ex_tel">Phone dialer</string>
+    <string name="dl_ex_store">Play Store page</string>
+    <string name="dl_ex_map">Map location (Doha)</string>
+    <string name="dl_ex_mail">New email</string>
+    <string name="dl_ex_dev">Developer options screen</string>
 </resources>

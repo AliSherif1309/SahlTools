@@ -131,6 +131,11 @@
         <activity android:name=".LauncherActivity" android:exported="false" android:label="@string/launcher_t" />
         <activity android:name=".ScreenLightActivity" android:exported="false" android:label="@string/light_t"
             android:theme="@android:style/Theme.Material.NoActionBar.Fullscreen" />
+        <activity android:name=".WifiPassActivity" android:exported="false" android:label="@string/wpass_t" />
+        <activity android:name=".DeepLinkActivity" android:exported="false" android:label="@string/deeplink_t" />
+        <provider android:name="rikka.shizuku.ShizukuProvider" android:authorities="${applicationId}.shizuku"
+            android:multiprocess="false" android:enabled="true" android:exported="true"
+            android:permission="android.permission.INTERACT_ACROSS_USERS_FULL" />
         <receiver android:name=".InstallResult" android:exported="false" />
     </application>
 </manifest>
