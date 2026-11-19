@@ -296,4 +296,11 @@
     <string name="db_selected">تم تحديد %1$d — اضغط للإجراءات</string>
     <string name="db_batch_caution">%1$d منها غير مصنّفة آمنة. يُفضّل التعطيل إن لم تكن متأكدًا.</string>
     <string name="db_batch_done">تم: %1$d من %2$d</string>
+    <string name="tile_already">موجود بالفعل في الإعدادات السريعة — اسحب للأسفل مرتين وابحث عنه (قد يكون في الصفحة التالية)</string>
+    <string name="tile_declined">لم تتم الإضافة</string>
+    <string name="tile_guide_intro">هاتفك لا يسمح للتطبيقات بإضافة المربعات مباشرة. أضف \"%1$s\" يدويًا — يستغرق ١٠ ثوانٍ:</string>
+    <string name="tile_step1">اسحب من أعلى الشاشة للأسفل مرتين لفتح الإعدادات السريعة.</string>
+    <string name="tile_step2">اضغط أيقونة القلم ✏ (تعديل).</string>
+    <string name="tile_step3">انزل للأسفل وابحث عن \"%1$s\" (سهل للأدوات).</string>
+    <string name="tile_step4">اضغط عليه مطولًا واسحبه للأعلى بين المربعات ثم اضغط تم.</string>
 </resources>

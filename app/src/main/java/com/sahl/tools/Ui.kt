@@ -86,3 +86,42 @@ fun Context.sahlDialog(title: String, content: android.view.View, vararg buttons
 fun Context.actions(vararg buttons: android.view.View): LinearLayout =
     if (buttons.size <= 2) row(*buttons)
     else LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; gravity = Gravity.START; for (b in buttons) addView(b) }
+
+/**
+ * Adds a Quick Settings tile. Uses Android's "Add tile" pop-up when the phone supports it;
+ * on phones that block or ignore it (often Honor/MagicOS), shows clear steps to add it by hand.
+ */
+fun Activity.addQuickTile(cls: Class<*>, title: Int, icon: Int) {
+    var answered = false
+    val guide = Runnable {
+        if (answered || isFinishing) return@Runnable
+        answered = true
+        val box = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
+        box.addView(label(getString(R.string.tile_guide_intro, getString(title)), 14f, R.color.sub).apply { setPadding(0, 0, 0, dp(8)) })
+        for ((i, step) in listOf(R.string.tile_step1, R.string.tile_step2, R.string.tile_step3, R.string.tile_step4).withIndex())
+            box.addView(label("${i + 1}.  " + getString(step, getString(title)), 15f).apply { setPadding(0, dp(4), 0, dp(4)) })
+        sahlDialog(getString(R.string.add_tile), box, getString(android.R.string.ok) to { d: android.app.AlertDialog -> d.dismiss() })
+    }
+    if (android.os.Build.VERSION.SDK_INT < 33) { guide.run(); return }
+    try {
+        getSystemService(android.app.StatusBarManager::class.java).requestAddTileService(
+            android.content.ComponentName(this, cls), getString(title),
+            android.graphics.drawable.Icon.createWithResource(this, icon), mainExecutor) { code ->
+            when (code) {
+                android.app.StatusBarManager.TILE_ADD_REQUEST_RESULT_TILE_ADDED -> {
+                    answered = true; Toast.makeText(this, R.string.tile_added, Toast.LENGTH_SHORT).show()
+                }
+                android.app.StatusBarManager.TILE_ADD_REQUEST_RESULT_TILE_ALREADY_ADDED -> {
+                    answered = true; Toast.makeText(this, R.string.tile_already, Toast.LENGTH_LONG).show()
+                }
+                android.app.StatusBarManager.TILE_ADD_REQUEST_RESULT_TILE_NOT_ADDED -> {
+                    answered = true; Toast.makeText(this, R.string.tile_declined, Toast.LENGTH_SHORT).show()
+                }
+                else -> guide.run()    // blocked or not supported by this phone
+            }
+        }
+        // If the phone never shows the pop-up, explain how to add it by hand
+        // (if Android's pop-up is on screen, our window has lost focus — then we wait for the answer instead)
+        window.decorView.postDelayed({ if (hasWindowFocus()) guide.run() }, 2500)
+    } catch (_: Throwable) { guide.run() }
+}

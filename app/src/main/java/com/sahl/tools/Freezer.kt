@@ -315,10 +315,8 @@ class FreezerActivity : Activity() {
             addView(actions(
                 sahlButton("❄  " + getString(R.string.fr_pin_freeze)) { Freezer.pinAll(this@FreezerActivity, "freeze") },
                 sahlButton("☀  " + getString(R.string.fr_pin_unfreeze)) { Freezer.pinAll(this@FreezerActivity, "unfreeze") }))
-            if (Build.VERSION.SDK_INT >= 33) addView(sahlButton(getString(R.string.add_tile)) {
-                getSystemService(android.app.StatusBarManager::class.java).requestAddTileService(
-                    ComponentName(this@FreezerActivity, FreezeTile::class.java), getString(R.string.fr_t),
-                    Icon.createWithResource(this@FreezerActivity, R.drawable.ic_freeze), mainExecutor) { }
+            addView(sahlButton(getString(R.string.add_tile)) {
+                addQuickTile(FreezeTile::class.java, R.string.fr_t, R.drawable.ic_freeze)
             })
         })
 

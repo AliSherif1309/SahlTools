@@ -296,4 +296,11 @@ Password: %2$s</string>
     <string name="db_selected">%1$d selected — tap for actions</string>
     <string name="db_batch_caution">%1$d of these are not marked safe. Prefer Disable if you are unsure.</string>
     <string name="db_batch_done">Done: %1$d of %2$d</string>
+    <string name="tile_already">Already in Quick Settings — pull down twice and look for it (it may be on the next page)</string>
+    <string name="tile_declined">Not added</string>
+    <string name="tile_guide_intro">Your phone doesn\'t allow apps to add tiles directly. Add \"%1$s\" by hand — it takes 10 seconds:</string>
+    <string name="tile_step1">Swipe down twice from the top to open Quick Settings.</string>
+    <string name="tile_step2">Tap the ✏ pencil (Edit) icon.</string>
+    <string name="tile_step3">Scroll to the bottom and find \"%1$s\" (Sahl Tools).</string>
+    <string name="tile_step4">Hold it and drag it up into your tiles, then tap Done.</string>
 </resources>

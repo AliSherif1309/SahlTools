@@ -157,7 +157,7 @@ class MainActivity : Activity() {
             }
             c.addView(bar)
         }
-        if (Build.VERSION.SDK_INT >= 33) c.addView(button(getString(R.string.add_tile)) {
+        c.addView(button(getString(R.string.add_tile)) {
             addTile(Tools.tileClass(k), Tools.title(k), Tools.icon(k))
         })
         return c
@@ -170,16 +170,7 @@ class MainActivity : Activity() {
     }
 
     /** Asks Android to put this tool's tile in the Quick Settings panel (Android 13+). */
-    private fun addTile(cls: Class<*>, title: Int, icon: Int) {
-        if (Build.VERSION.SDK_INT < 33) return
-        getSystemService(StatusBarManager::class.java).requestAddTileService(
-            ComponentName(this, cls), getString(title),
-            Icon.createWithResource(this, icon), mainExecutor
-        ) { code ->
-            if (code == StatusBarManager.TILE_ADD_REQUEST_RESULT_TILE_ADDED || code == StatusBarManager.TILE_ADD_REQUEST_RESULT_TILE_ALREADY_ADDED)
-                Toast.makeText(this, R.string.tile_added, Toast.LENGTH_SHORT).show()
-        }
-    }
+    private fun addTile(cls: Class<*>, title: Int, icon: Int) = addQuickTile(cls, title, icon)
 
     /** Makes Sahl Tools the link opener, so every tapped link is checked first. */
     private fun askBrowserRole() {
