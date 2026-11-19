@@ -20,7 +20,11 @@
     <string name="stop">Stop</string>
     <string name="running">is on</string>
     <string name="channel">Running tools</string>
-    <string name="update_available">Update %1$s available — tap to download</string>
+    <string name="update_available">Update %1$s available — tap to install</string>
     <string name="battery_hint">Tip: on Honor, set Sahl Tools to \"Manage manually\" in Battery → App launch so locks are not stopped.</string>
     <string name="stopwatch">Start stopwatch (counts up from 0)</string>
+    <string name="check_updates">Check for updates</string>
+    <string name="up_to_date">You have the latest version</string>
+    <string name="downloading">Downloading update… %1$d%%</string>
+    <string name="update_failed">Update failed — tap to try again</string>
 </resources>

@@ -20,7 +20,11 @@
     <string name="stop">إيقاف</string>
     <string name="running">يعمل</string>
     <string name="channel">الأدوات العاملة</string>
-    <string name="update_available">التحديث %1$s متوفّر — اضغط للتنزيل</string>
+    <string name="update_available">التحديث %1$s متوفّر — اضغط للتثبيت</string>
     <string name="battery_hint">نصيحة: في هونر اجعل سهل للأدوات على \"إدارة يدوية\" من البطارية ← تشغيل التطبيقات حتى لا تتوقف الأقفال.</string>
     <string name="stopwatch">ابدأ ساعة الإيقاف (عدّ تصاعدي من ٠)</string>
+    <string name="check_updates">التحقق من التحديثات</string>
+    <string name="up_to_date">لديك أحدث إصدار</string>
+    <string name="downloading">جارٍ تنزيل التحديث… %1$d%%</string>
+    <string name="update_failed">فشل التحديث — اضغط للمحاولة مجددًا</string>
 </resources>

@@ -24,9 +24,6 @@ import android.widget.ScrollView
 import android.widget.Switch
 import android.widget.TextView
 import android.widget.Toast
-import org.json.JSONObject
-import java.net.HttpURLConnection
-import java.net.URL
 
 class MainActivity : Activity() {
     private val switches = HashMap<String, Switch>()
@@ -63,6 +60,7 @@ class MainActivity : Activity() {
 
         for (k in Tools.ALL) list.addView(card(k), LinearLayout.LayoutParams(-1, -2).apply { bottomMargin = dp(12) })
 
+        list.addView(button(getString(R.string.check_updates) + "  ·  v" + BuildConfig.VERSION_NAME) { checkUpdate(true) })
         list.addView(text(getString(R.string.battery_hint), 13f, R.color.sub).apply { setPadding(dp(4), dp(8), dp(4), 0) })
         setContentView(ScrollView(this).apply { addView(list) })
 
@@ -152,22 +150,27 @@ class MainActivity : Activity() {
         super.onPause()
     }
 
-    /** Looks for a newer GitHub release and shows a gold bar to download it. */
-    private fun checkUpdate() = Thread {
-        try {
-            val con = (URL("https://api.github.com/repos/AliSherif1309/SahlTools/releases/latest").openConnection() as HttpURLConnection)
-                .apply { connectTimeout = 8000; readTimeout = 8000 }
-            val j = JSONObject(con.inputStream.bufferedReader().readText())
-            val tag = j.getString("tag_name")
-            val code = tag.substringAfterLast('.').toIntOrNull() ?: 0
-            val assets = j.getJSONArray("assets")
-            var url = ""
-            for (i in 0 until assets.length()) assets.getJSONObject(i).let { if (it.getString("name").endsWith(".apk")) url = it.getString("browser_download_url") }
-            if (code > BuildConfig.VERSION_CODE && url.isNotEmpty()) runOnUiThread {
-                updateBar.text = getString(R.string.update_available, tag)
-                updateBar.visibility = View.VISIBLE
-                updateBar.setOnClickListener { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url))) }
+    /** Checks GitHub for a newer version; the gold bar downloads and installs it inside the app. */
+    private fun checkUpdate(manual: Boolean = false) = Thread {
+        val r = Updater.fetchNewer()
+        runOnUiThread {
+            if (r == null) {
+                if (manual) Toast.makeText(this, R.string.up_to_date, Toast.LENGTH_SHORT).show()
+                return@runOnUiThread
             }
-        } catch (_: Exception) { }
+            updateBar.text = getString(R.string.update_available, r.tag)
+            updateBar.visibility = View.VISIBLE
+            updateBar.setOnClickListener {
+                if (!Updater.canInstall(this)) return@setOnClickListener
+                updateBar.isEnabled = false
+                Thread {
+                    try {
+                        Updater.install(this, r) { pct -> runOnUiThread { updateBar.text = getString(R.string.downloading, pct) } }
+                    } catch (e: Exception) {
+                        runOnUiThread { updateBar.isEnabled = true; updateBar.text = getString(R.string.update_failed) }
+                    }
+                }.start()
+            }
+        }
     }.start()
 }
