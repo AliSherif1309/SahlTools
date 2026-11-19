@@ -385,6 +385,7 @@ class AppPickerActivity : Activity() {
         })
         list = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
         col.addView(list)
+        list.addView(label(getString(R.string.working), 14f, R.color.sub))
         Thread {
             val a = packageManager.getInstalledApplications(PackageManager.MATCH_DISABLED_COMPONENTS)
                 .filter { it.packageName !in Freezer.protectedPkgs }
