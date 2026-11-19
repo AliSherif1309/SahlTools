@@ -223,8 +223,8 @@ class FreezerActivity : Activity() {
         col.addSpaced(card().apply {
             addView(label(getString(R.string.fr_summary, frozen, list.size), 18f, R.color.emerald, true))
             addView(actions(
-                sahlButton("❄  " + getString(R.string.fr_freeze_all)) { work { Freezer.freezeAll(this) } },
-                sahlButton("☀  " + getString(R.string.fr_unfreeze_all)) { work { Freezer.unfreezeAll(this) } },
+                sahlButton("❄  " + getString(R.string.fr_freeze_all)) { work { Freezer.freezeAll(this@FreezerActivity) } },
+                sahlButton("☀  " + getString(R.string.fr_unfreeze_all)) { work { Freezer.unfreezeAll(this@FreezerActivity) } },
                 sahlButton("＋  " + getString(R.string.fr_add)) { startActivity(Intent(this@FreezerActivity, AppPickerActivity::class.java)) }))
             // Auto-freeze settings
             val p = Tools.prefs(this@FreezerActivity)
