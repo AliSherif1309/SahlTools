@@ -19,8 +19,11 @@ object Tools {
     const val VOLUME = "volume"
     const val TOUCH = "touch"
     const val TIMER = "timer"
+    const val FLASH = "flash"
+    const val DIM = "dim"
+    const val SOUND = "sound"
     const val CHANGED = "com.sahl.tools.CHANGED"
-    val ALL = listOf(SCREEN, VOLUME, TOUCH, TIMER)
+    val ALL = listOf(SCREEN, VOLUME, TOUCH, TIMER, FLASH, DIM, SOUND)
 
     fun prefs(c: Context) = c.getSharedPreferences("sahl", Context.MODE_PRIVATE)
     fun isOn(c: Context, k: String) = prefs(c).getBoolean(k, false)
@@ -35,22 +38,28 @@ object Tools {
         SCREEN -> ScreenTile::class.java
         VOLUME -> VolumeTile::class.java
         TOUCH -> TouchTile::class.java
-        else -> TimerTile::class.java
+        TIMER -> TimerTile::class.java
+        FLASH -> FlashTile::class.java
+        DIM -> DimTile::class.java
+        else -> SoundTile::class.java
     }
 
     fun title(k: String) = when (k) {
         SCREEN -> R.string.screen_t; VOLUME -> R.string.volume_t
-        TOUCH -> R.string.touch_t; else -> R.string.timer_t
+        TOUCH -> R.string.touch_t; TIMER -> R.string.timer_t
+        FLASH -> R.string.flash_t; DIM -> R.string.dim_t; else -> R.string.sound_t
     }
 
     fun desc(k: String) = when (k) {
         SCREEN -> R.string.screen_d; VOLUME -> R.string.volume_d
-        TOUCH -> R.string.touch_d; else -> R.string.timer_d
+        TOUCH -> R.string.touch_d; TIMER -> R.string.timer_d
+        FLASH -> R.string.flash_d; DIM -> R.string.dim_d; else -> R.string.sound_d
     }
 
     fun icon(k: String) = when (k) {
         SCREEN -> R.drawable.ic_screen; VOLUME -> R.drawable.ic_volume
-        TOUCH -> R.drawable.ic_touch; else -> R.drawable.ic_timer
+        TOUCH -> R.drawable.ic_touch; TIMER -> R.drawable.ic_timer
+        FLASH -> R.drawable.ic_flash; DIM -> R.drawable.ic_dim; else -> R.drawable.ic_sound
     }
 
     /** Which system permission a tool needs, or null if it is already granted. */
@@ -58,7 +67,7 @@ object Tools {
         val pkg = android.net.Uri.parse("package:" + c.packageName)
         return when (k) {
             SCREEN -> if (Settings.System.canWrite(c)) null else Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS, pkg)
-            TOUCH, TIMER -> if (Settings.canDrawOverlays(c)) null else Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, pkg)
+            TOUCH, TIMER, DIM -> if (Settings.canDrawOverlays(c)) null else Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, pkg)
             else -> null
         }?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     }
@@ -71,6 +80,9 @@ object Tools {
             SCREEN -> if (on) KeepScreen.disable(c) else KeepScreen.enable(c)
             VOLUME -> service(c, VolumeLockService::class.java, !on)
             TOUCH -> service(c, TouchLockService::class.java, !on)
+            FLASH -> Torch.toggle(c)
+            DIM -> service(c, DimService::class.java, !on)
+            SOUND -> SoundMode.cycle(c)
             TIMER -> {
                 if (on && countdownMin == 0) service(c, TimerService::class.java, false)
                 else c.startForegroundService(Intent(c, TimerService::class.java).putExtra("min", countdownMin))

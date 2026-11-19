@@ -11,7 +11,10 @@ import android.service.quicksettings.TileService
 
 /** One Quick Settings tile per tool. All share the same logic. */
 abstract class ToolTile(private val key: String) : TileService() {
-    override fun onStartListening() = refresh()
+    override fun onStartListening() {
+        if (key == Tools.FLASH) Torch.watch(this)
+        refresh()
+    }
 
     override fun onClick() {
         val perm = Tools.missingPermission(this, key)
@@ -28,6 +31,10 @@ abstract class ToolTile(private val key: String) : TileService() {
     private fun refresh() {
         val t = qsTile ?: return
         t.state = if (Tools.isOn(this, key)) Tile.STATE_ACTIVE else Tile.STATE_INACTIVE
+        if (key == Tools.SOUND) {
+            t.state = Tile.STATE_ACTIVE
+            if (Build.VERSION.SDK_INT >= 29) t.subtitle = SoundMode.name(this)
+        }
         t.updateTile()
     }
 
@@ -44,6 +51,22 @@ class ScreenTile : ToolTile(Tools.SCREEN)
 class VolumeTile : ToolTile(Tools.VOLUME)
 class TouchTile : ToolTile(Tools.TOUCH)
 class TimerTile : ToolTile(Tools.TIMER)
+class FlashTile : ToolTile(Tools.FLASH)
+class DimTile : ToolTile(Tools.DIM)
+class SoundTile : ToolTile(Tools.SOUND)
+
+/** Opens the QR & barcode scanner straight from Quick Settings. */
+class ScanTile : TileService() {
+    override fun onStartListening() { qsTile?.apply { state = Tile.STATE_INACTIVE; updateTile() } }
+
+    @SuppressLint("StartActivityAndCollapseDeprecated")
+    override fun onClick() {
+        val i = Intent(this, ScanActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        if (Build.VERSION.SDK_INT >= 34)
+            startActivityAndCollapse(PendingIntent.getActivity(this, 0, i, PendingIntent.FLAG_IMMUTABLE))
+        else startActivityAndCollapse(i)
+    }
+}
 
 /** Invisible helper: lets a tile close the Quick Settings panel, then turns the tool on. */
 class ActionActivity : Activity() {

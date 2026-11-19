@@ -26,7 +26,6 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import kotlin.math.abs
 
-private fun Context.dp(v: Int) = (v * resources.displayMetrics.density).toInt()
 
 private fun overlayParams(w: Int, h: Int, flags: Int) = WindowManager.LayoutParams(
     w, h, WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY, flags, PixelFormat.TRANSLUCENT

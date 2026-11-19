@@ -9,4 +9,7 @@
         <item name="android:windowNoDisplay">true</item>
         <item name="android:windowAnimationStyle">@null</item>
     </style>
+    <style name="Clear" parent="android:Theme.Translucent.NoTitleBar">
+        <item name="android:windowAnimationStyle">@null</item>
+    </style>
 </resources>

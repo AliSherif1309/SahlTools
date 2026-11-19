@@ -27,6 +27,7 @@ import android.widget.Toast
 
 class MainActivity : Activity() {
     private val switches = HashMap<String, Switch>()
+    private var soundBtn: Button? = null
     private lateinit var font: Typeface
     private lateinit var updateBar: TextView
     private val receiver = object : BroadcastReceiver() {
@@ -60,6 +61,9 @@ class MainActivity : Activity() {
 
         for (k in Tools.ALL) list.addView(card(k), LinearLayout.LayoutParams(-1, -2).apply { bottomMargin = dp(12) })
 
+        list.addView(text(getString(R.string.share_tools), 20f, R.color.emerald, true).apply { setPadding(dp(4), dp(12), 0, dp(8)) })
+        list.addView(utilityCards(), LinearLayout.LayoutParams(-1, -2))
+
         list.addView(button(getString(R.string.check_updates) + "  ·  v" + BuildConfig.VERSION_NAME) { checkUpdate(true) })
         list.addView(text(getString(R.string.battery_hint), 13f, R.color.sub).apply { setPadding(dp(4), dp(8), dp(4), 0) })
         setContentView(ScrollView(this).apply { addView(list) })
@@ -91,7 +95,7 @@ class MainActivity : Activity() {
                 sync()
             }
         }
-        switches[k] = sw
+        if (k == Tools.SOUND) sw.visibility = View.GONE else switches[k] = sw
         top.addView(sw)
         c.addView(top)
         c.addView(text(getString(Tools.desc(k)), 14f, R.color.sub).apply { setPadding(0, dp(8), 0, dp(4)) })
@@ -114,7 +118,31 @@ class MainActivity : Activity() {
                 sync()
             })
         }
-        if (Build.VERSION.SDK_INT >= 33) c.addView(button(getString(R.string.add_tile)) { addTile(k) })
+        if (k == Tools.SOUND) {
+            soundBtn = button("") { Tools.toggle(this, k); sync() }
+            c.addView(soundBtn)
+            val nm = getSystemService(android.app.NotificationManager::class.java)
+            if (!nm.isNotificationPolicyAccessGranted) c.addView(button(getString(R.string.allow_silent)) {
+                startActivity(Intent(android.provider.Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS))
+            })
+        }
+        if (k == Tools.DIM) {
+            val bar = android.widget.SeekBar(this).apply {
+                max = 70; progress = Tools.prefs(this@MainActivity).getInt("dim", 40) - 10
+                setOnSeekBarChangeListener(object : android.widget.SeekBar.OnSeekBarChangeListener {
+                    override fun onProgressChanged(sb: android.widget.SeekBar, p: Int, user: Boolean) {
+                        Tools.prefs(this@MainActivity).edit().putInt("dim", p + 10).apply()
+                        if (Tools.isOn(this@MainActivity, k)) startForegroundService(Intent(this@MainActivity, DimService::class.java))
+                    }
+                    override fun onStartTrackingTouch(sb: android.widget.SeekBar) {}
+                    override fun onStopTrackingTouch(sb: android.widget.SeekBar) {}
+                })
+            }
+            c.addView(bar)
+        }
+        if (Build.VERSION.SDK_INT >= 33) c.addView(button(getString(R.string.add_tile)) {
+            addTile(Tools.tileClass(k), Tools.title(k), Tools.icon(k))
+        })
         return c
     }
 
@@ -125,18 +153,55 @@ class MainActivity : Activity() {
     }
 
     /** Asks Android to put this tool's tile in the Quick Settings panel (Android 13+). */
-    private fun addTile(k: String) {
+    private fun addTile(cls: Class<*>, title: Int, icon: Int) {
         if (Build.VERSION.SDK_INT < 33) return
         getSystemService(StatusBarManager::class.java).requestAddTileService(
-            ComponentName(this, Tools.tileClass(k)), getString(Tools.title(k)),
-            Icon.createWithResource(this, Tools.icon(k)), mainExecutor
+            ComponentName(this, cls), getString(title),
+            Icon.createWithResource(this, icon), mainExecutor
         ) { code ->
             if (code == StatusBarManager.TILE_ADD_REQUEST_RESULT_TILE_ADDED || code == StatusBarManager.TILE_ADD_REQUEST_RESULT_TILE_ALREADY_ADDED)
                 Toast.makeText(this, R.string.tile_added, Toast.LENGTH_SHORT).show()
         }
     }
 
-    private fun sync() { for ((k, s) in switches) s.isChecked = Tools.isOn(this, k) }
+    private fun sync() {
+        for ((k, s) in switches) s.isChecked = Tools.isOn(this, k)
+        soundBtn?.text = getString(R.string.sound_now, SoundMode.name(this))
+    }
+
+    /** Scan & share tools: each opens its own screen, or works from Android's Share menu. */
+    private fun utilityCards(): LinearLayout {
+        val col = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
+        fun add(title: Int, desc: Int, icon: Int, vararg actions: Pair<Int, () -> Unit>) {
+            val c = card()
+            val top = LinearLayout(this).apply { gravity = Gravity.CENTER_VERTICAL }
+            top.addView(ImageView(this).apply {
+                setImageResource(icon); background = rounded(R.color.emerald, 14); setPadding(dp(9), dp(9), dp(9), dp(9))
+            }, LinearLayout.LayoutParams(dp(42), dp(42)))
+            top.addView(text(getString(title), 19f, R.color.text, true).apply { setPadding(dp(12), 0, dp(12), 0) })
+            c.addView(top)
+            c.addView(text(getString(desc), 14f, R.color.sub).apply { setPadding(0, dp(8), 0, dp(4)) })
+            val r = LinearLayout(this)
+            for ((label, act) in actions) r.addView(button(getString(label)) { act() })
+            c.addView(r)
+            col.addSpaced(c)
+        }
+        add(R.string.scan_t, R.string.scan_d, R.drawable.ic_scan,
+            R.string.open to { startActivity(Intent(this, ScanActivity::class.java)) },
+            R.string.add_tile to { addTile(ScanTile::class.java, R.string.scan_t, R.drawable.ic_scan) })
+        add(R.string.link_t, R.string.link_d, R.drawable.ic_link,
+            R.string.paste_link to {
+                val clip = getSystemService(android.content.ClipboardManager::class.java).primaryClip
+                val t = clip?.takeIf { it.itemCount > 0 }?.getItemAt(0)?.coerceToText(this)?.toString() ?: ""
+                startActivity(Intent(this, LinkActivity::class.java).putExtra(Intent.EXTRA_TEXT, t))
+            })
+        add(R.string.photo_t, R.string.photo_d, R.drawable.ic_photo,
+            R.string.pick_photos to { startActivity(Intent(this, PickPhotosActivity::class.java)) })
+        add(R.string.save_t, R.string.save_d, R.drawable.ic_save)
+        add(R.string.wifi_t, R.string.wifi_d, R.drawable.ic_wifi,
+            R.string.open to { startActivity(Intent(this, WifiActivity::class.java)) })
+        return col
+    }
 
     override fun onResume() {
         super.onResume()
