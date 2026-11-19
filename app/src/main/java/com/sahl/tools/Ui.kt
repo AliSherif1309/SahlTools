@@ -67,3 +67,22 @@ fun Context.openLink(text: String) = try {
     if (text.startsWith("http", true)) LinkActivity.openInBrowser(this, text)
     else startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(text)))
 } catch (_: Exception) { Toast.makeText(this, text, Toast.LENGTH_SHORT).show() }
+
+/** A dialog in the Sahl colours (works in dark mode): title, content, and our own buttons. */
+fun Context.sahlDialog(title: String, content: android.view.View, vararg buttons: Pair<String, (android.app.AlertDialog) -> Unit>): android.app.AlertDialog {
+    val col = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(dp(20), dp(18), dp(20), dp(8)) }
+    col.addView(label(title, 20f, R.color.text, true).apply { setPadding(0, 0, 0, dp(8)) })
+    col.addView(content)
+    val bar = LinearLayout(this).apply { gravity = Gravity.END }
+    col.addView(bar, LinearLayout.LayoutParams(-1, -2))
+    val d = android.app.AlertDialog.Builder(this).setView(ScrollView(this).apply { addView(col) }).create()
+    for ((t, act) in buttons) bar.addView(sahlButton(t) { act(d) })
+    d.window?.setBackgroundDrawable(rounded(R.color.card, 24))
+    d.show()
+    return d
+}
+
+/** Buttons that wrap onto new lines instead of squashing (simple vertical list when there are many). */
+fun Context.actions(vararg buttons: android.view.View): LinearLayout =
+    if (buttons.size <= 2) row(*buttons)
+    else LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; gravity = Gravity.START; for (b in buttons) addView(b) }

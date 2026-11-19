@@ -206,9 +206,7 @@ class MainActivity : Activity() {
             top.addView(text(getString(title), 19f, R.color.text, true).apply { setPadding(dp(12), 0, dp(12), 0) })
             c.addView(top)
             c.addView(text(getString(desc), 14f, R.color.sub).apply { setPadding(0, dp(8), 0, dp(4)) })
-            val r = LinearLayout(this)
-            for ((label, act) in actions) r.addView(button(getString(label)) { act() })
-            c.addView(r)
+            c.addView(actions(*actions.map { (label, act) -> button(getString(label)) { act() } }.toTypedArray()))
             col.addSpaced(c)
         }
         add(R.string.scan_t, R.string.scan_d, R.drawable.ic_scan,
@@ -217,6 +215,7 @@ class MainActivity : Activity() {
         add(R.string.link_t, R.string.link_d, R.drawable.ic_link,
             R.string.open to { startActivity(Intent(this, LinkActivity::class.java)) },
             R.string.check_all_links to { askBrowserRole() },
+            R.string.vt_key_title to { LinkSafety.askKey(this) {} },
             R.string.change_opener to { LinkActivity.forgetBrowser(this); Toast.makeText(this, R.string.opener_reset, Toast.LENGTH_SHORT).show() })
         add(R.string.photo_t, R.string.photo_d, R.drawable.ic_photo,
             R.string.pick_photos to { startActivity(Intent(this, PickPhotosActivity::class.java)) })

@@ -93,17 +93,52 @@ object LinkSafety {
         return Verdict(s.optInt("malicious"), s.optInt("suspicious"), total)
     }
 
-    /** Small box to paste the free VirusTotal API key once. */
+    private val keyShape = Regex("\\b[0-9a-f]{64}\\b")
+
+    /** A VirusTotal key found on the clipboard, if any (64 letters/numbers 0-9 a-f). */
+    fun keyFromClipboard(c: Context): String? = try {
+        val clip = c.getSystemService(android.content.ClipboardManager::class.java).primaryClip
+        clip?.takeIf { it.itemCount > 0 }?.getItemAt(0)?.coerceToText(c)?.let { keyShape.find(it.toString().lowercase())?.value }
+    } catch (_: Exception) { null }
+
+    /** Blocking: true if VirusTotal accepts the key. */
+    fun testKey(key: String) = try { get(key, "domains/google.com"); true } catch (_: Exception) { false }
+
+    /** Step-by-step setup for the free VirusTotal key, with paste-and-test. */
     fun askKey(c: Context, done: () -> Unit) {
+        val col = LinearLayout(c).apply { orientation = LinearLayout.VERTICAL }
+        col.addView(c.label(c.getString(R.string.vt_why), 14f, R.color.sub).apply { setPadding(0, 0, 0, c.dp(10)) })
+        col.addView(c.label("1.  " + c.getString(R.string.vt_step1), 15f, bold = true))
+        col.addView(c.sahlButton(c.getString(R.string.vt_open_signup)) { c.openLink("https://www.virustotal.com/gui/join-us") })
+        col.addView(c.label("2.  " + c.getString(R.string.vt_step2), 15f, bold = true))
+        col.addView(c.sahlButton(c.getString(R.string.vt_open_key)) { c.openLink("https://www.virustotal.com/gui/my-apikey") })
+        col.addView(c.label("3.  " + c.getString(R.string.vt_step3), 15f, bold = true))
         val box = EditText(c).apply {
-            hint = "API key"; setText(key(c)); inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+            hint = "API key"; setText(key(c).ifEmpty { keyFromClipboard(c) ?: "" }); typeface = c.sahlFont(); textSize = 13f
+            setTextColor(c.getColor(R.color.text)); setHintTextColor(c.getColor(R.color.sub))
+            inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
         }
-        val wrap = LinearLayout(c).apply { setPadding(c.dp(20), c.dp(8), c.dp(20), 0); addView(box, LinearLayout.LayoutParams(-1, -2)) }
-        AlertDialog.Builder(c).setTitle(R.string.vt_key_title).setMessage(R.string.vt_key_how).setView(wrap)
-            .setPositiveButton(R.string.save_key) { _, _ ->
-                Tools.prefs(c).edit().putString("vtKey", box.text.toString().trim()).apply(); done()
-            }
-            .setNeutralButton(R.string.get_key) { _, _ -> c.openLink("https://www.virustotal.com/gui/join-us") }
-            .setNegativeButton(android.R.string.cancel, null).show()
+        col.addView(box, LinearLayout.LayoutParams(-1, -2))
+        val status = c.label("", 14f, R.color.emerald, true)
+        col.addView(c.sahlButton(c.getString(R.string.paste_link)) {
+            keyFromClipboard(c)?.let { box.setText(it) } ?: run { status.text = c.getString(R.string.vt_no_clip) }
+        })
+        col.addView(status)
+        c.sahlDialog(c.getString(R.string.vt_key_title), col,
+            c.getString(android.R.string.cancel) to { d: android.app.AlertDialog -> d.dismiss() },
+            c.getString(R.string.save_key) to { d ->
+                val k = box.text.toString().trim().lowercase()
+                if (!keyShape.matches(k)) status.text = c.getString(R.string.vt_wrong_shape)
+                else Thread {
+                    val ok = testKey(k)
+                    android.os.Handler(android.os.Looper.getMainLooper()).post {
+                        if (ok) {
+                            Tools.prefs(c).edit().putString("vtKey", k).apply()
+                            android.widget.Toast.makeText(c, R.string.vt_key_ok, android.widget.Toast.LENGTH_LONG).show()
+                            d.dismiss(); done()
+                        } else status.text = c.getString(R.string.vt_bad_key)
+                    }
+                }.start().also { status.text = c.getString(R.string.vt_testing) }
+            })
     }
 }

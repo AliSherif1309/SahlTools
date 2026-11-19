@@ -20,6 +20,9 @@ import android.widget.TextView
  */
 class LinkPopupActivity : Activity() {
     private lateinit var urlView: TextView
+    private lateinit var banner: TextView
+    private lateinit var beforeView: TextView
+    private var original = ""
     private lateinit var hostView: TextView
     private lateinit var steps: LinearLayout
     private lateinit var params: LinearLayout
@@ -52,9 +55,17 @@ class LinkPopupActivity : Activity() {
         col.addView(row(
             label("🔗  " + getString(R.string.link_t), 15f, R.color.emerald, true).apply { layoutParams = LinearLayout.LayoutParams(0, -2, 1f) },
             label("✕", 18f, R.color.sub).apply { setPadding(dp(12), 0, dp(4), 0); setOnClickListener { finish() } }))
-        hostView = label("", 22f, R.color.text, true).apply { setPadding(0, dp(6), 0, 0) }
-        urlView = label("", 13f, R.color.sub).apply { setTextIsSelectable(true); maxLines = 4 }
-        col.addView(hostView); col.addView(urlView)
+        hostView = label("", 22f, R.color.text, true).apply { setPadding(0, dp(6), 0, dp(6)) }
+        banner = label("", 15f, R.color.card, true).apply {
+            setPadding(dp(12), dp(8), dp(12), dp(8)); background = rounded(R.color.emerald, 12); visibility = View.GONE
+        }
+        beforeView = label("", 12f, R.color.sub).apply { maxLines = 4; visibility = View.GONE }
+        urlView = label("", 14f, R.color.text, true).apply { setTextIsSelectable(true); maxLines = 5 }
+        col.addView(hostView); col.addView(banner)
+        col.addView(label(getString(R.string.pop_before), 12f, R.color.sub).apply { setPadding(0, dp(8), 0, 0); tag = "beforeLabel" })
+        col.addView(beforeView)
+        col.addView(label(getString(R.string.pop_after), 12f, R.color.emerald, true).apply { setPadding(0, dp(6), 0, 0) })
+        col.addView(urlView)
 
         steps = section(col, R.string.pop_steps)
         params = section(col, R.string.pop_tracking)
@@ -93,6 +104,7 @@ class LinkPopupActivity : Activity() {
 
     // ───── checking ─────
     private fun start(url: String) {
+        original = url
         show(url)
         val s1 = step("⏳  " + getString(R.string.pop_following))
         Thread {
@@ -143,8 +155,36 @@ class LinkPopupActivity : Activity() {
         return b.build().toString()
     }
 
+    /** Shows the original link with the removed parts struck through in red, the clean link, and a green summary. */
     private fun refresh() {
-        urlView.text = current()
+        val now = current()
+        urlView.text = now
+        val removed = query.filter { it.third.isChecked }
+        val changed = now != original
+        beforeView.visibility = if (changed) View.VISIBLE else View.GONE
+        (beforeView.parent as LinearLayout).findViewWithTag<View>("beforeLabel")?.visibility = beforeView.visibility
+        if (changed) {
+            val sp = android.text.SpannableString(original)
+            for ((n, v, _) in removed) {
+                val enc = n + "=" + Uri.encode(v)
+                for (piece in listOf(enc, "$n=$v")) {
+                    val i = original.indexOf(piece)
+                    if (i >= 0) {
+                        sp.setSpan(android.text.style.StrikethroughSpan(), i, i + piece.length, 0)
+                        sp.setSpan(android.text.style.ForegroundColorSpan(0xFFE53935.toInt()), i, i + piece.length, 0)
+                        break
+                    }
+                }
+            }
+            beforeView.text = sp
+        }
+        val saved = original.length - now.length
+        banner.visibility = View.VISIBLE
+        banner.text = when {
+            removed.isNotEmpty() && saved > 0 -> "✂  " + getString(R.string.pop_banner, removed.size, saved)
+            changed -> "↪  " + getString(R.string.pop_banner_redirect)
+            else -> "✓  " + getString(R.string.pop_banner_clean)
+        }
     }
 
     private fun safety() {
@@ -157,7 +197,10 @@ class LinkPopupActivity : Activity() {
         vtButtons.addView(sahlButton(getString(R.string.vt_scan)) { scan() })
         vtButtons.addView(sahlButton(getString(R.string.vt_report)) { LinkActivity.openInBrowser(this, LinkSafety.vtReport(current())) })
         if (LinkSafety.key(this).isNotEmpty()) scan()
-        else vtView.text = getString(R.string.vt_no_key)
+        else {
+            vtView.text = getString(R.string.vt_no_key)
+            vtButtons.addView(sahlButton(getString(R.string.vt_setup)) { LinkSafety.askKey(this) { scan() } }, 0)
+        }
     }
 
     private fun scan() {

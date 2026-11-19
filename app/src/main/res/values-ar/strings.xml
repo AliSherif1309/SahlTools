@@ -142,4 +142,20 @@
     <string name="always_use">استخدم هذا التطبيق دائمًا</string>
     <string name="change_opener">تغيير تطبيق الفتح</string>
     <string name="opener_reset">سيسألك الرابط التالي عن التطبيق المطلوب</string>
+    <string name="pop_before">قبل (الأحمر = تم حذفه)</string>
+    <string name="pop_after">الرابط النظيف</string>
+    <string name="pop_banner">تم التنظيف: إزالة %1$d من رموز التتبّع · أقصر بـ %2$d حرفًا</string>
+    <string name="pop_banner_redirect">تم فتحه إلى العنوان الحقيقي</string>
+    <string name="pop_banner_clean">هذا الرابط كان نظيفًا أصلًا</string>
+    <string name="vt_setup">إعداد فحص الفيروسات (مجاني، دقيقة واحدة)</string>
+    <string name="vt_why">يفحص VirusTotal الروابط بحوالي ٩٠ برنامج مكافحة فيروسات. مجاني — تحتاج مفتاحًا مرة واحدة فقط.</string>
+    <string name="vt_step1">أنشئ حسابًا مجانيًا (أو سجّل الدخول)</string>
+    <string name="vt_open_signup">افتح صفحة التسجيل في VirusTotal</string>
+    <string name="vt_step2">افتح صفحة مفتاح API واضغط أيقونة النسخ بجانب المفتاح</string>
+    <string name="vt_open_key">افتح صفحة مفتاحي</string>
+    <string name="vt_step3">ارجع هنا — يُلصق المفتاح تلقائيًا. اضغط حفظ.</string>
+    <string name="vt_no_clip">لا يوجد مفتاح في الحافظة بعد — انسخه أولًا (الخطوة ٢)</string>
+    <string name="vt_wrong_shape">لا يبدو هذا مفتاح VirusTotal (٦٤ حرفًا ورقمًا)</string>
+    <string name="vt_testing">جارٍ اختبار المفتاح…</string>
+    <string name="vt_key_ok">✓ المفتاح يعمل — تُفحص الروابط الآن تلقائيًا من الفيروسات</string>
 </resources>

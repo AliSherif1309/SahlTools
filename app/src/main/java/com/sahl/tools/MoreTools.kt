@@ -133,7 +133,9 @@ class DimService : Service() {
 
 // ───────────────────────── Link cleaner ─────────────────────────
 object LinkCleaner {
-    private val junk = Regex("^(utm_.*|fbclid|gclid|dclid|gbraid|wbraid|msclkid|mc_eid|mc_cid|igshid|igsh|si|feature|ref|ref_src|ref_url|" +
+    private val junk = Regex("^(ref_.*|pd_rd_.*|pf_rd_.*|_encoding|psc|qid|sr|crid|sprefix|linkCode|linkId|tag|ascsubtag|content-id|dib|dib_tag|" +
+        "_ga|_gl|oly_enc_id|oly_anon_id|vero_id|rb_clickid|wickedid|irclickid|cmpid|ncid|ocid|soc_src|soc_trk|at_medium|at_campaign|" +
+        "utm_.*|fbclid|gclid|dclid|gbraid|wbraid|msclkid|mc_eid|mc_cid|igshid|igsh|si|feature|ref|ref_src|ref_url|" +
         "_hsenc|_hsmi|yclid|twclid|ttclid|s_cid|spm|scm|share_id|sharer|smid|pp|xmt|mibextid|trk|trkCampaign|campaign_id|ad_id)$", RegexOption.IGNORE_CASE)
 
     fun findUrl(text: String) = findAll(text).firstOrNull()

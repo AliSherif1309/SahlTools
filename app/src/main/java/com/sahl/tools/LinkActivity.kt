@@ -155,15 +155,15 @@ class LinkActivity : Activity() {
         private fun picker(c: Context, url: String, apps: List<android.content.pm.ResolveInfo>,
                            chosen: (android.content.pm.ResolveInfo, Boolean) -> Unit) {
             val pm = c.packageManager
-            val list = LinearLayout(c).apply { orientation = LinearLayout.VERTICAL; setPadding(c.dp(8), c.dp(4), c.dp(8), 0) }
+            val list = LinearLayout(c).apply { orientation = LinearLayout.VERTICAL; setPadding(0, 0, 0, 0) }
             val always = android.widget.CheckBox(c).apply {
                 text = c.getString(R.string.always_use); typeface = c.sahlFont(); setTextColor(c.getColor(R.color.text))
             }
-            list.addView(c.label(Uri.parse(url).host ?: url, 13f, R.color.sub).apply { setPadding(c.dp(12), 0, 0, c.dp(6)) })
+            list.addView(c.label(Uri.parse(url).host ?: url, 13f, R.color.sub).apply { setPadding(0, 0, 0, c.dp(6)) })
             var dialog: AlertDialog? = null
             for (p in apps) {
                 val row = LinearLayout(c).apply {
-                    gravity = Gravity.CENTER_VERTICAL; setPadding(c.dp(12), c.dp(10), c.dp(12), c.dp(10))
+                    gravity = Gravity.CENTER_VERTICAL; setPadding(c.dp(8), c.dp(10), c.dp(8), c.dp(10))
                     isClickable = true; background = c.getDrawable(android.R.drawable.list_selector_background)
                     setOnClickListener { dialog?.dismiss(); chosen(p, always.isChecked) }
                 }
@@ -172,9 +172,7 @@ class LinkActivity : Activity() {
                 list.addView(row)
             }
             list.addView(always)
-            dialog = AlertDialog.Builder(c).setTitle(R.string.open_with)
-                .setView(android.widget.ScrollView(c).apply { addView(list) })
-                .setNegativeButton(android.R.string.cancel, null).show()
+            dialog = c.sahlDialog(c.getString(R.string.open_with), list, c.getString(android.R.string.cancel) to { d: android.app.AlertDialog -> d.dismiss() })
         }
 
         /** Forget the remembered app so the picker shows again. */

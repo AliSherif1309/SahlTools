@@ -142,4 +142,20 @@
     <string name="always_use">Always use this app</string>
     <string name="change_opener">Change opening app</string>
     <string name="opener_reset">Next link will ask which app to use</string>
+    <string name="pop_before">Before (red = removed)</string>
+    <string name="pop_after">Clean link</string>
+    <string name="pop_banner">Cleaned: %1$d tracking code(s) removed · %2$d characters shorter</string>
+    <string name="pop_banner_redirect">Opened to the real address</string>
+    <string name="pop_banner_clean">This link was already clean</string>
+    <string name="vt_setup">Set up virus scan (free, 1 minute)</string>
+    <string name="vt_why">VirusTotal checks links with about 90 antivirus engines. It is free — you only need a key once.</string>
+    <string name="vt_step1">Create a free account (or sign in)</string>
+    <string name="vt_open_signup">Open VirusTotal sign up</string>
+    <string name="vt_step2">Open your API key page and tap the copy icon next to the key</string>
+    <string name="vt_open_key">Open my API key page</string>
+    <string name="vt_step3">Come back here — the key is pasted automatically. Tap Save.</string>
+    <string name="vt_no_clip">No key on the clipboard yet — copy it first (step 2)</string>
+    <string name="vt_wrong_shape">That doesn\'t look like a VirusTotal key (64 letters and numbers)</string>
+    <string name="vt_testing">Testing the key…</string>
+    <string name="vt_key_ok">✓ Key works — links are now scanned for viruses automatically</string>
 </resources>
