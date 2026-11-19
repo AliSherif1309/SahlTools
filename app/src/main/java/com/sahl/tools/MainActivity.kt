@@ -138,10 +138,10 @@ class MainActivity : Activity() {
         }
         if (k == Tools.DIM) {
             val bar = android.widget.SeekBar(this).apply {
-                max = 70; progress = Tools.prefs(this@MainActivity).getInt("dim", 40) - 10
+                max = 70; progress = Tools.prefs(this@MainActivity).getInt("dimLevel", 40) - 10
                 setOnSeekBarChangeListener(object : android.widget.SeekBar.OnSeekBarChangeListener {
                     override fun onProgressChanged(sb: android.widget.SeekBar, p: Int, user: Boolean) {
-                        Tools.prefs(this@MainActivity).edit().putInt("dim", p + 10).apply()
+                        Tools.prefs(this@MainActivity).edit().putInt("dimLevel", p + 10).apply()
                         if (Tools.isOn(this@MainActivity, k)) startForegroundService(Intent(this@MainActivity, DimService::class.java))
                     }
                     override fun onStartTrackingTouch(sb: android.widget.SeekBar) {}

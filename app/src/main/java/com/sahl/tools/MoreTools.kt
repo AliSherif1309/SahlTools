@@ -127,7 +127,7 @@ class DimService : Service() {
 
     companion object {
         /** Darkness 10–80 %. Android lets touches through only up to 80 %. */
-        fun level(c: Context) = Tools.prefs(c).getInt("dim", 40).coerceIn(10, 80) / 100f
+        fun level(c: Context) = Tools.prefs(c).getInt("dimLevel", 40).coerceIn(10, 80) / 100f
     }
 }
 
