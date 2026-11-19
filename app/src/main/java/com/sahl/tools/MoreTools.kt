@@ -204,8 +204,49 @@ class LinkActivity : Activity() {
                 buttons.addView(sahlButton(getString(R.string.share)) { shareText(clean) })
                 buttons.addView(sahlButton(getString(R.string.open)) { openLink(clean) })
                 buttons.visibility = View.VISIBLE
+                col.addSpaced(safetyCard(clean))
             }
         }.start()
+    }
+
+    /** Warning signs found on the phone, plus a VirusTotal scan. */
+    private fun safetyCard(url: String) = card().apply {
+        addView(label(getString(R.string.safety_t), 18f, R.color.emerald, true))
+        val w = LinkSafety.warnings(url)
+        if (w.isEmpty()) addView(label("✓  " + getString(R.string.ws_none), 15f).apply { setPadding(0, dp(6), 0, dp(6)) })
+        else for (r in w) addView(label("⚠  " + getString(r), 15f).apply { setPadding(0, dp(4), 0, dp(4)) })
+        val vt = label("", 16f, bold = true).apply { setPadding(0, dp(6), 0, 0) }
+        addView(vt)
+        val scan = sahlButton(getString(R.string.vt_scan)) {}
+        scan.setOnClickListener {
+            val key = LinkSafety.key(this@LinkActivity)
+            if (key.isEmpty()) { LinkSafety.askKey(this@LinkActivity) { scan.performClick() }; return@setOnClickListener }
+            vt.setTextColor(getColor(R.color.text)); vt.text = getString(R.string.vt_scanning); scan.isEnabled = false
+            Thread {
+                val msg: String; val bad: Boolean
+                try {
+                    val v = LinkSafety.virusTotal(key, url)
+                    when {
+                        v == null -> { msg = getString(R.string.vt_slow); bad = false }
+                        v.malicious + v.suspicious > 0 -> { msg = "⛔  " + getString(R.string.vt_bad, v.malicious + v.suspicious, v.total); bad = true }
+                        else -> { msg = "✓  " + getString(R.string.vt_clean, v.total); bad = false }
+                    }
+                } catch (e: SecurityException) {
+                    runOnUiThread { scan.isEnabled = true; vt.text = getString(R.string.vt_bad_key); LinkSafety.askKey(this@LinkActivity) { scan.performClick() } }
+                    return@Thread
+                } catch (e: Exception) {
+                    runOnUiThread { scan.isEnabled = true; vt.text = getString(R.string.vt_error) }
+                    return@Thread
+                }
+                runOnUiThread {
+                    scan.isEnabled = true; vt.text = msg
+                    vt.setTextColor(if (bad) 0xFFC62828.toInt() else getColor(R.color.emerald))
+                }
+            }.start()
+        }
+        addView(row(scan, sahlButton(getString(R.string.vt_site)) { openLink(LinkSafety.vtWebsite(url)) }))
+        addView(sahlButton(getString(R.string.vt_key_title)) { LinkSafety.askKey(this@LinkActivity) {} })
+        if (LinkSafety.key(this@LinkActivity).isNotEmpty()) scan.performClick()
     }
 }
 

@@ -48,7 +48,7 @@
     <string name="open">فتح</string>
     <string name="copied">تم النسخ</string>
     <string name="link_t">منظّف الروابط</string>
-    <string name="link_d">شارك رابطًا مع سهل للأدوات (أو الصقه) — يفتح الروابط المختصرة ويزيل رموز التتبّع.</string>
+    <string name="link_d">شارك رابطًا مع سهل للأدوات (أو الصقه) — يفتح الروابط المختصرة ويزيل رموز التتبّع ويفحص الرابط من البرمجيات الخبيثة والتصيّد.</string>
     <string name="paste_link">لصق رابط</string>
     <string name="no_link">لا يوجد رابط. انسخ رابطًا أولًا أو شاركه مع سهل للأدوات.</string>
     <string name="working">جارٍ العمل…</string>
@@ -77,4 +77,27 @@
     <string name="share_clean_link">تنظيف الرابط</string>
     <string name="share_clean_photo">إزالة بيانات الصورة</string>
     <string name="share_save">حفظ في الهاتف</string>
+    <string name="safety_t">فحص الأمان</string>
+    <string name="ws_none">لا توجد علامات تحذير في هذا الرابط</string>
+    <string name="ws_bad">لا يبدو هذا رابط ويب عاديًا</string>
+    <string name="ws_http">غير آمن (http) — ما تكتبه يمكن رؤيته</string>
+    <string name="ws_ip">يستخدم عنوانًا رقميًا بدل اسم موقع</string>
+    <string name="ws_lookalike">يستخدم حروفًا مشابهة لتقليد موقع حقيقي</string>
+    <string name="ws_tld">نهاية تستخدمها مواقع الاحتيال كثيرًا</string>
+    <string name="ws_at">يحتوي على @ — الموقع الحقيقي بعدها لا قبلها</string>
+    <string name="ws_long">عنوان طويل أو متعدد الطبقات بشكل غير معتاد</string>
+    <string name="ws_short">رابط مختصر لم يُفتح — العنوان الحقيقي مخفي</string>
+    <string name="ws_brand">يذكر علامة تجارية معروفة لكنه ليس موقعها — احتمال تصيّد</string>
+    <string name="vt_scan">افحص عبر VirusTotal</string>
+    <string name="vt_site">افتح في VirusTotal</string>
+    <string name="vt_scanning">جارٍ الفحص بحوالي ٩٠ برنامج مكافحة فيروسات…</string>
+    <string name="vt_clean">نظيف — 0 من %1$d برنامجًا أبلغ عنه</string>
+    <string name="vt_bad">خطير — %1$d من %2$d برنامجًا أبلغ عنه. لا تفتحه.</string>
+    <string name="vt_slow">الفحص يستغرق وقتًا — حاول بعد دقيقة</string>
+    <string name="vt_error">تعذّر الوصول إلى VirusTotal — تحقق من الإنترنت</string>
+    <string name="vt_bad_key">مفتاح VirusTotal غير صالح</string>
+    <string name="vt_key_title">مفتاح VirusTotal</string>
+    <string name="vt_key_how">مجاني: سجّل في virustotal.com، ثم افتح ملفك الشخصي ← \"API key\"، انسخه والصقه هنا. يُحفظ على هذا الهاتف فقط.</string>
+    <string name="save_key">حفظ</string>
+    <string name="get_key">احصل على مفتاح مجاني</string>
 </resources>
