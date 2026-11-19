@@ -174,6 +174,21 @@ class MainActivity : Activity() {
         }
     }
 
+    /** Makes Sahl Tools the link opener, so every tapped link is checked first. */
+    private fun askBrowserRole() {
+        if (Build.VERSION.SDK_INT >= 29) {
+            val rm = getSystemService(android.app.role.RoleManager::class.java)
+            if (rm.isRoleHeld(android.app.role.RoleManager.ROLE_BROWSER)) {
+                Toast.makeText(this, R.string.links_on, Toast.LENGTH_LONG).show()
+                startActivity(Intent(android.provider.Settings.ACTION_MANAGE_DEFAULT_APPS_SETTINGS)); return
+            }
+            if (rm.isRoleAvailable(android.app.role.RoleManager.ROLE_BROWSER)) {
+                startActivityForResult(rm.createRequestRoleIntent(android.app.role.RoleManager.ROLE_BROWSER), 5); return
+            }
+        }
+        startActivity(Intent(android.provider.Settings.ACTION_MANAGE_DEFAULT_APPS_SETTINGS))
+    }
+
     private fun sync() {
         for ((k, s) in switches) s.isChecked = Tools.isOn(this, k)
         soundBtn?.text = getString(R.string.sound_now, SoundMode.name(this))
@@ -200,7 +215,8 @@ class MainActivity : Activity() {
             R.string.open to { startActivity(Intent(this, ScanActivity::class.java)) },
             R.string.add_tile to { addTile(ScanTile::class.java, R.string.scan_t, R.drawable.ic_scan) })
         add(R.string.link_t, R.string.link_d, R.drawable.ic_link,
-            R.string.open to { startActivity(Intent(this, LinkActivity::class.java)) })
+            R.string.open to { startActivity(Intent(this, LinkActivity::class.java)) },
+            R.string.check_all_links to { askBrowserRole() })
         add(R.string.photo_t, R.string.photo_d, R.drawable.ic_photo,
             R.string.pick_photos to { startActivity(Intent(this, PickPhotosActivity::class.java)) })
         add(R.string.save_t, R.string.save_d, R.drawable.ic_save)

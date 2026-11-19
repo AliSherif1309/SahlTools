@@ -120,12 +120,12 @@ class LinkActivity : Activity() {
 
     companion object {
         /** Opens a link in a real browser — never back into Sahl Tools. Remembers the browser you pick. */
-        fun openInBrowser(c: Context, url: String) {
+        fun openInBrowser(c: Context, url: String, ask: Boolean = false) {
             val view = Intent(Intent.ACTION_VIEW, Uri.parse(url)).addCategory(Intent.CATEGORY_BROWSABLE)
             val browsers = c.packageManager.queryIntentActivities(view, 0)
                 .filter { it.activityInfo.packageName != c.packageName }
             val saved = Tools.prefs(c).getString("browser", null)
-            val pick = browsers.firstOrNull { it.activityInfo.packageName == saved } ?: browsers.singleOrNull()
+            val pick = if (ask) null else browsers.firstOrNull { it.activityInfo.packageName == saved } ?: browsers.singleOrNull()
             fun go(p: android.content.pm.ResolveInfo) = c.startActivity(Intent(view)
                 .setComponent(ComponentName(p.activityInfo.packageName, p.activityInfo.name)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
             when {
@@ -135,7 +135,7 @@ class LinkActivity : Activity() {
                     val pm = c.packageManager
                     AlertDialog.Builder(c).setTitle(R.string.pick_browser)
                         .setItems(browsers.map { it.loadLabel(pm) }.toTypedArray()) { _, i ->
-                            Tools.prefs(c).edit().putString("browser", browsers[i].activityInfo.packageName).apply()
+                            if (!ask) Tools.prefs(c).edit().putString("browser", browsers[i].activityInfo.packageName).apply()
                             go(browsers[i])
                         }.show()
                 }

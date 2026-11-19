@@ -124,4 +124,19 @@
     <string name="crash_t">Something went wrong last time</string>
     <string name="crash_copy">Copy details</string>
     <string name="crash_dismiss">Dismiss</string>
+    <string name="open_with">Open with…</string>
+    <string name="pop_steps">What happened</string>
+    <string name="pop_tracking">Tracking &amp; extra codes (ticked = removed)</string>
+    <string name="pop_following">Following the link…</string>
+    <string name="pop_redirects">Redirected %1$d time(s) — showing the real address</string>
+    <string name="pop_no_redirect">No hidden redirects</string>
+    <string name="pop_removed_n">%1$d tracking code(s) removed</string>
+    <string name="pop_no_params">No codes in this link</string>
+    <string name="pop_remove_all">Remove all</string>
+    <string name="pop_keep_all">Keep all</string>
+    <string name="vt_report">Full report</string>
+    <string name="vt_no_key">Add your free VirusTotal key to scan for viruses</string>
+    <string name="vt_live">Scanning with ~90 antivirus engines… %1$ds</string>
+    <string name="check_all_links">Check every link I tap</string>
+    <string name="links_on">Sahl Tools already checks every link you tap. You can change it here.</string>
 </resources>

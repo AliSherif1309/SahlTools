@@ -124,4 +124,19 @@
     <string name="crash_t">حدث خطأ في المرة السابقة</string>
     <string name="crash_copy">نسخ التفاصيل</string>
     <string name="crash_dismiss">إخفاء</string>
+    <string name="open_with">فتح باستخدام…</string>
+    <string name="pop_steps">ما الذي حدث</string>
+    <string name="pop_tracking">رموز التتبّع والرموز الإضافية (المحدّد = يُحذف)</string>
+    <string name="pop_following">جارٍ تتبّع الرابط…</string>
+    <string name="pop_redirects">تمت إعادة التوجيه %1$d مرة — يظهر العنوان الحقيقي</string>
+    <string name="pop_no_redirect">لا توجد إعادة توجيه مخفية</string>
+    <string name="pop_removed_n">تمت إزالة %1$d من رموز التتبّع</string>
+    <string name="pop_no_params">لا توجد رموز في هذا الرابط</string>
+    <string name="pop_remove_all">إزالة الكل</string>
+    <string name="pop_keep_all">إبقاء الكل</string>
+    <string name="vt_report">التقرير الكامل</string>
+    <string name="vt_no_key">أضف مفتاح VirusTotal المجاني لفحص الفيروسات</string>
+    <string name="vt_live">جارٍ الفحص بحوالي ٩٠ برنامج مكافحة فيروسات… %1$d ث</string>
+    <string name="check_all_links">افحص كل رابط أضغط عليه</string>
+    <string name="links_on">سهل للأدوات يفحص بالفعل كل رابط تضغطه. يمكنك تغيير ذلك من هنا.</string>
 </resources>

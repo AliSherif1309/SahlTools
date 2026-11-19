@@ -52,7 +52,11 @@ object LinkSafety {
     data class Verdict(val malicious: Int, val suspicious: Int, val total: Int)
 
     /** Blocking. Looks the link up on VirusTotal; if it is new, submits it and waits for the result. */
-    fun virusTotal(key: String, url: String): Verdict? {
+    /** Address of the full VirusTotal report page for a link. */
+    fun vtReport(url: String) = "https://www.virustotal.com/gui/url/" +
+        java.security.MessageDigest.getInstance("SHA-256").digest(url.toByteArray()).joinToString("") { "%02x".format(it) }
+
+    fun virusTotal(key: String, url: String, progress: (Int) -> Unit = {}): Verdict? {
         val id = Base64.encodeToString(url.toByteArray(), Base64.URL_SAFE or Base64.NO_PADDING or Base64.NO_WRAP)
         get(key, "urls/$id")?.let { return stats(it.getJSONObject("data").getJSONObject("attributes").getJSONObject("last_analysis_stats")) }
         val con = (URL("https://www.virustotal.com/api/v3/urls").openConnection() as HttpURLConnection).apply {
@@ -62,7 +66,8 @@ object LinkSafety {
         con.outputStream.use { it.write(("url=" + URLEncoder.encode(url, "UTF-8")).toByteArray()) }
         if (con.responseCode != 200) throw IllegalStateException("VT ${con.responseCode}")
         val analysis = JSONObject(con.inputStream.bufferedReader().readText()).getJSONObject("data").getString("id")
-        repeat(8) {
+        repeat(8) { n ->
+            progress(n + 1)
             Thread.sleep(5000)
             val a = get(key, "analyses/$analysis")?.getJSONObject("data")?.getJSONObject("attributes") ?: return@repeat
             if (a.optString("status") == "completed") return stats(a.getJSONObject("stats"))

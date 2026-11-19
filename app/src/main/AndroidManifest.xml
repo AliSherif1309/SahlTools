@@ -86,15 +86,17 @@
         <activity android:name="com.journeyapps.barcodescanner.CaptureActivity" android:screenOrientation="fullSensor" tools:replace="screenOrientation" />
         <activity android:name=".WifiActivity" android:exported="false" android:label="@string/wifi_t" />
         <activity android:name=".PickPhotosActivity" android:exported="false" android:theme="@style/Clear" />
-        <activity android:name=".LinkActivity" android:exported="true" android:label="@string/share_clean_link">
-            <intent-filter android:label="@string/check_link">
+        <activity android:name=".LinkActivity" android:exported="false" android:label="@string/link_t" />
+        <activity android:name=".LinkPopupActivity" android:exported="true" android:label="@string/check_link"
+            android:theme="@style/Popup" android:excludeFromRecents="true" android:taskAffinity="" android:documentLaunchMode="always">
+            <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="http" />
                 <data android:scheme="https" />
             </intent-filter>
-            <intent-filter>
+            <intent-filter android:label="@string/share_clean_link">
                 <action android:name="android.intent.action.SEND" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:mimeType="text/plain" />

@@ -145,7 +145,13 @@ object LinkCleaner {
         .distinct().take(20).toList()
 
     /** Follows short links (bit.ly, t.co …) to the real address. Blocking. */
-    fun expand(url: String): String {
+    fun isTracking(name: String) = junk.matches(name)
+
+    fun expand(url: String) = chain(url).last()
+
+    /** Every address a link passes through before the real page (short links, redirects). Blocking. */
+    fun chain(url: String): List<String> {
+        val hops = arrayListOf(url)
         var u = url
         repeat(6) {
             val con = (URL(u).openConnection() as HttpURLConnection).apply {
@@ -155,10 +161,11 @@ object LinkCleaner {
             val code = con.responseCode
             val loc = con.getHeaderField("Location")
             con.disconnect()
-            if (code !in 300..399 || loc == null) return u
+            if (code !in 300..399 || loc == null) return hops
             u = URL(URL(u), loc).toString()
+            hops.add(u)
         }
-        return u
+        return hops
     }
 
     fun clean(url: String): String {
