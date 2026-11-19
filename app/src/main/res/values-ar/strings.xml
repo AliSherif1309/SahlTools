@@ -8,7 +8,7 @@
     <string name="touch_t">قفل اللمس</string>
     <string name="touch_d">يمنع كل اللمسات — مناسب لمشاهدة الفيديو أو عند إعطاء الهاتف لطفل. اضغط على القفل ٣ مرات لفتحه.</string>
     <string name="timer_t">المؤقّت العائم</string>
-    <string name="timer_d">ساعة إيقاف صغيرة تطفو فوق أي تطبيق. ضغطة: تشغيل/إيقاف مؤقت · ضغطة مطوّلة: تصفير · اسحب لتحريكها.</string>
+    <string name="timer_d">يطفو فوق أي تطبيق: ساعة إيقاف تعدّ تصاعديًا من ٠، أو عدّ تنازلي. ضغطة: تشغيل/إيقاف مؤقت · ضغطة مطوّلة: تصفير · اسحب لتحريكها.</string>
     <string name="add_tile">أضِف إلى الإعدادات السريعة</string>
     <string name="minutes">دقائق</string>
     <string name="countdown">ابدأ العدّ التنازلي</string>
@@ -22,4 +22,5 @@
     <string name="channel">الأدوات العاملة</string>
     <string name="update_available">التحديث %1$s متوفّر — اضغط للتنزيل</string>
     <string name="battery_hint">نصيحة: في هونر اجعل سهل للأدوات على \"إدارة يدوية\" من البطارية ← تشغيل التطبيقات حتى لا تتوقف الأقفال.</string>
+    <string name="stopwatch">ابدأ ساعة الإيقاف (عدّ تصاعدي من ٠)</string>
 </resources>

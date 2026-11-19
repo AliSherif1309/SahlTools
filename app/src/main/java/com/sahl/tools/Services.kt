@@ -206,8 +206,10 @@ class TimerService : Service() {
     override fun onStartCommand(i: Intent?, flags: Int, id: Int): Int {
         Tools.foreground(this, Tools.TIMER, 13)
         if (i?.action == "stop") { stopSelf(); return START_NOT_STICKY }
+        // min > 0 = countdown, otherwise a stopwatch counting up from 00:00 — starts right away
         val min = i?.getIntExtra("min", 0) ?: 0
-        if (min > 0) { countdownMs = min * 60_000L; reset(); startPause() }
+        countdownMs = if (min > 0) min * 60_000L else 0L
+        reset(); startPause()
         return START_NOT_STICKY
     }
 

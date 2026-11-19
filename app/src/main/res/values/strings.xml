@@ -8,7 +8,7 @@
     <string name="touch_t">Touch Lock</string>
     <string name="touch_d">Blocks all touches — great for videos or handing the phone to a child. Tap the lock 3 times to unlock.</string>
     <string name="timer_t">Floating Timer</string>
-    <string name="timer_d">A small stopwatch that floats over any app. Tap: start/pause · Hold: reset · Drag: move.</string>
+    <string name="timer_d">Floats over any app: a stopwatch counting up from 0, or a countdown. Tap: start/pause · Hold: reset · Drag: move.</string>
     <string name="add_tile">Add to Quick Settings</string>
     <string name="minutes">Minutes</string>
     <string name="countdown">Start countdown</string>
@@ -22,4 +22,5 @@
     <string name="channel">Running tools</string>
     <string name="update_available">Update %1$s available — tap to download</string>
     <string name="battery_hint">Tip: on Honor, set Sahl Tools to \"Manage manually\" in Battery → App launch so locks are not stopped.</string>
+    <string name="stopwatch">Start stopwatch (counts up from 0)</string>
 </resources>

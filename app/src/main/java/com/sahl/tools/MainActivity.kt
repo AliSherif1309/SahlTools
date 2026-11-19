@@ -111,6 +111,10 @@ class MainActivity : Activity() {
                 sync()
             })
             c.addView(row)
+            c.addView(button("⏱  " + getString(R.string.stopwatch)) {
+                if (!Tools.toggle(this, k, -1)) Tools.missingPermission(this, k)?.let { startActivity(it) }
+                sync()
+            })
         }
         if (Build.VERSION.SDK_INT >= 33) c.addView(button(getString(R.string.add_tile)) { addTile(k) })
         return c
