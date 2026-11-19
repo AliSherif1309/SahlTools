@@ -7,6 +7,7 @@ import android.os.Build
 class SahlApp : Application() {
     override fun onCreate() {
         super.onCreate()
+        Freezer.app = this
         val previous = Thread.getDefaultUncaughtExceptionHandler()
         Thread.setDefaultUncaughtExceptionHandler { t, e ->
             val report = "Sahl Tools v${BuildConfig.VERSION_NAME} · Android ${Build.VERSION.RELEASE} · ${Build.MANUFACTURER} ${Build.MODEL}\n" +

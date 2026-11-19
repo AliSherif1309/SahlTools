@@ -275,4 +275,25 @@
     <string name="db_confirm">سيختفي لديك ويتوقف عن العمل. تبقى ملفاته على الهاتف فيمكنك استرجاعه من تبويب المحذوفة في أي وقت.</string>
     <string name="db_done">تم</string>
     <string name="db_failed">لم ينجح:</string>
+    <string name="fr_done_freeze">❄ تم تجميد %1$d تطبيقات</string>
+    <string name="fr_done_unfreeze">☀ تم فك تجميد %1$d تطبيقات</string>
+    <string name="fr_skip_charging">لا تجمّد تلقائيًا أثناء الشحن</string>
+    <string name="fr_mode">طريقة التجميد: %1$s (اضغط للتغيير)</string>
+    <string name="fr_mode_disable">تعطيل</string>
+    <string name="fr_mode_suspend">إيقاف مؤقت</string>
+    <string name="fr_mode_help">التعطيل يخفي التطبيق تمامًا (أكبر توفير للبطارية). الإيقاف المؤقت يبقي أيقونته رمادية على الشاشة الرئيسية.</string>
+    <string name="fr_tile_action">مربع الإعدادات السريعة يقوم بـ: %1$s (اضغط للتغيير)</string>
+    <string name="fr_toggle">تجميد ⇄ فك التجميد</string>
+    <string name="fr_pin_freeze">زر رئيسي: جمّد الكل</string>
+    <string name="fr_pin_unfreeze">زر رئيسي: فك تجميد الكل</string>
+    <string name="db_suggested">⭐ مقترحة</string>
+    <string name="db_select_safe">حدّد كل ✓ الآمنة</string>
+    <string name="db_restore_all">استرجاع الكل</string>
+    <string name="db_nothing">لا توجد تطبيقات زائدة معروفة على هاتفك 👍</string>
+    <string name="db_keep">أبقِه</string>
+    <string name="db_safe">آمن للحذف</string>
+    <string name="db_caution">بحذر</string>
+    <string name="db_selected">تم تحديد %1$d — اضغط للإجراءات</string>
+    <string name="db_batch_caution">%1$d منها غير مصنّفة آمنة. يُفضّل التعطيل إن لم تكن متأكدًا.</string>
+    <string name="db_batch_done">تم: %1$d من %2$d</string>
 </resources>

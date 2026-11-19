@@ -57,13 +57,45 @@ object Freezer {
     fun save(c: Context, s: Set<String>) { Tools.prefs(c).edit().putStringSet("freezeList", s).apply(); refreshTile(c) }
 
     fun isFrozen(c: Context, pkg: String) = try {
-        c.packageManager.getApplicationEnabledSetting(pkg) == PackageManager.COMPONENT_ENABLED_STATE_DISABLED_USER ||
-            c.packageManager.getApplicationEnabledSetting(pkg) == PackageManager.COMPONENT_ENABLED_STATE_DISABLED
+        val st = c.packageManager.getApplicationEnabledSetting(pkg)
+        st == PackageManager.COMPONENT_ENABLED_STATE_DISABLED_USER || st == PackageManager.COMPONENT_ENABLED_STATE_DISABLED ||
+            c.packageManager.getApplicationInfo(pkg, PackageManager.MATCH_DISABLED_COMPONENTS).flags and ApplicationInfo.FLAG_SUSPENDED != 0
+    } catch (_: Exception) { false }
+
+    /** Long-press shortcuts on the Sahl Tools icon: Freeze all / Unfreeze all. */
+    fun updateShortcuts(c: Context) = try {
+        val sm = c.getSystemService(ShortcutManager::class.java)
+        sm.dynamicShortcuts = listOf("freeze" to R.string.fr_freeze_all, "unfreeze" to R.string.fr_unfreeze_all).map { (a, t) ->
+            ShortcutInfo.Builder(c, "all_$a").setShortLabel(c.getString(t))
+                .setIcon(Icon.createWithResource(c, if (a == "freeze") R.drawable.ic_freeze else R.drawable.ic_light))
+                .setIntent(Intent(c, FreezeLaunchActivity::class.java).setAction(Intent.ACTION_VIEW).putExtra("all", a)).build()
+        }
+    } catch (_: Exception) { }
+
+    /** Puts a "Freeze all" or "Unfreeze all" button on the home screen. */
+    fun pinAll(c: Context, action: String) = try {
+        c.getSystemService(ShortcutManager::class.java).requestPinShortcut(
+            ShortcutInfo.Builder(c, "pin_all_$action").setShortLabel(c.getString(if (action == "freeze") R.string.fr_freeze_all else R.string.fr_unfreeze_all))
+                .setIcon(Icon.createWithResource(c, if (action == "freeze") R.drawable.ic_freeze else R.drawable.ic_light))
+                .setIntent(Intent(c, FreezeLaunchActivity::class.java).setAction(Intent.ACTION_VIEW).putExtra("all", action)).build(), null)
     } catch (_: Exception) { false }
 
     /** Blocking. */
-    fun freeze(pkg: String) = pkg !in protectedPkgs && Shell.run("pm disable-user --user 0 $pkg").first == 0
-    fun unfreeze(pkg: String) = Shell.run("pm enable $pkg").first == 0
+    /** Set by SahlApp so freezing can read settings from anywhere. */
+    lateinit var app: Context
+
+    /** "disable" hides the app completely; "suspend" keeps its icon (greyed) and shows a message if opened. */
+    fun suspendMode() = Tools.prefs(app).getString("freezeMode", "disable") == "suspend"
+
+    fun freeze(pkg: String) = pkg !in protectedPkgs &&
+        Shell.run(if (suspendMode()) "pm suspend --user 0 $pkg" else "pm disable-user --user 0 $pkg").first == 0
+
+    /** Undoes both kinds of freezing, whichever was used. */
+    fun unfreeze(pkg: String): Boolean {
+        val a = Shell.run("pm enable $pkg").first
+        val b = Shell.run("pm unsuspend --user 0 $pkg").first
+        return a == 0 || b == 0
+    }
 
     fun allFrozen(c: Context) = list(c).let { l -> l.isNotEmpty() && l.all { isFrozen(c, it) } }
 
@@ -118,8 +150,18 @@ class FreezeLaunchActivity : Activity() {
     override fun onCreate(b: Bundle?) {
         super.onCreate(b)
         val pkg = intent.getStringExtra("pkg")
-        if (pkg != null && Shell.ready()) Freezer.launch(applicationContext, pkg)
-        else Toast.makeText(this, R.string.fr_need_shizuku_short, Toast.LENGTH_LONG).show()
+        val all = intent.getStringExtra("all")
+        val c = applicationContext
+        when {
+            !Shell.ready() -> Toast.makeText(this, R.string.fr_need_shizuku_short, Toast.LENGTH_LONG).show()
+            all != null -> Thread {
+                val n = if (all == "freeze") Freezer.freezeAll(c) else Freezer.unfreezeAll(c)
+                Handler(Looper.getMainLooper()).post {
+                    Toast.makeText(c, c.getString(if (all == "freeze") R.string.fr_done_freeze else R.string.fr_done_unfreeze, n), Toast.LENGTH_SHORT).show()
+                }
+            }.start()
+            pkg != null -> Freezer.launch(c, pkg)
+        }
         finish()
     }
 }
@@ -137,7 +179,9 @@ class FreezeTile : TileService() {
 
     override fun onClick() {
         if (!Shell.ready()) { Toast.makeText(this, R.string.fr_need_shizuku_short, Toast.LENGTH_LONG).show(); return }
-        val freeze = !Freezer.allFrozen(this)
+        val freeze = when (Tools.prefs(this).getString("tileAction", "toggle")) {
+            "freeze" -> true; "unfreeze" -> false; else -> !Freezer.allFrozen(this)
+        }
         Thread {
             if (freeze) Freezer.freezeAll(this) else Freezer.unfreezeAll(this)
             Handler(Looper.getMainLooper()).post { refresh() }
@@ -148,7 +192,9 @@ class FreezeTile : TileService() {
 /** Auto-freeze: while an app from the list is unfrozen, refreeze it a little after the screen turns off. Stops itself when done. */
 class AutoFreezeService : Service() {
     private val h = Handler(Looper.getMainLooper())
+    private fun charging() = getSystemService(android.os.BatteryManager::class.java).isCharging
     private val job = Runnable {
+        if (Tools.prefs(this).getBoolean("skipCharging", false) && charging()) return@Runnable   // try again when unplugged
         Thread {
             Freezer.freezeAll(this)
             h.post { stopSelf() }
@@ -159,6 +205,9 @@ class AutoFreezeService : Service() {
             when (i.action) {
                 Intent.ACTION_SCREEN_OFF -> { h.removeCallbacks(job); h.postDelayed(job, Tools.prefs(c).getInt("freezeDelay", 1) * 60_000L) }
                 Intent.ACTION_SCREEN_ON -> h.removeCallbacks(job)
+                Intent.ACTION_POWER_DISCONNECTED -> if (!getSystemService(android.os.PowerManager::class.java).isInteractive) {
+                    h.removeCallbacks(job); h.postDelayed(job, Tools.prefs(c).getInt("freezeDelay", 1) * 60_000L)
+                }
             }
         }
     }
@@ -167,7 +216,7 @@ class AutoFreezeService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        val f = IntentFilter().apply { addAction(Intent.ACTION_SCREEN_OFF); addAction(Intent.ACTION_SCREEN_ON) }
+        val f = IntentFilter().apply { addAction(Intent.ACTION_SCREEN_OFF); addAction(Intent.ACTION_SCREEN_ON); addAction(Intent.ACTION_POWER_DISCONNECTED) }
         if (Build.VERSION.SDK_INT >= 33) registerReceiver(receiver, f, Context.RECEIVER_EXPORTED) else registerReceiver(receiver, f)
     }
 
@@ -216,6 +265,7 @@ class FreezerActivity : Activity() {
     private fun draw() {
         while (col.childCount > 1) col.removeViewAt(1)
         if (!shizukuGate(col, R.string.fr_need_shizuku)) return
+        Freezer.updateShortcuts(this)
         val pm = packageManager
         val list = Freezer.list(this).filter { try { pm.getApplicationInfo(it, PackageManager.MATCH_DISABLED_COMPONENTS); true } catch (_: Exception) { false } }
         val frozen = list.count { Freezer.isFrozen(this, it) }
@@ -238,6 +288,33 @@ class FreezerActivity : Activity() {
                 val next = when (p.getInt("freezeDelay", 1)) { 0 -> 1; 1 -> 5; 5 -> 15; 15 -> 30; else -> 0 }
                 p.edit().putInt("freezeDelay", next).apply(); auto.text = getString(R.string.fr_auto, next)
             })
+            addView(android.widget.Switch(this@FreezerActivity).apply {
+                text = getString(R.string.fr_skip_charging); typeface = sahlFont(); setTextColor(getColor(R.color.text))
+                isChecked = p.getBoolean("skipCharging", false)
+                setOnCheckedChangeListener { _, on -> p.edit().putBoolean("skipCharging", on).apply() }
+            })
+            // Freezing mode
+            val modeBtn = sahlButton("") {}
+            fun modeText() = getString(R.string.fr_mode, getString(if (Freezer.suspendMode()) R.string.fr_mode_suspend else R.string.fr_mode_disable))
+            modeBtn.text = modeText()
+            modeBtn.setOnClickListener {
+                p.edit().putString("freezeMode", if (Freezer.suspendMode()) "disable" else "suspend").apply(); modeBtn.text = modeText()
+            }
+            addView(modeBtn)
+            addView(label(getString(R.string.fr_mode_help), 12f, R.color.sub))
+            // Tile action
+            val tileBtn = sahlButton("") {}
+            fun tileText() = getString(R.string.fr_tile_action, getString(when (p.getString("tileAction", "toggle")) {
+                "freeze" -> R.string.fr_freeze_all; "unfreeze" -> R.string.fr_unfreeze_all; else -> R.string.fr_toggle }))
+            tileBtn.text = tileText()
+            tileBtn.setOnClickListener {
+                val next = when (p.getString("tileAction", "toggle")) { "toggle" -> "freeze"; "freeze" -> "unfreeze"; else -> "toggle" }
+                p.edit().putString("tileAction", next).apply(); tileBtn.text = tileText()
+            }
+            addView(tileBtn)
+            addView(actions(
+                sahlButton("❄  " + getString(R.string.fr_pin_freeze)) { Freezer.pinAll(this@FreezerActivity, "freeze") },
+                sahlButton("☀  " + getString(R.string.fr_pin_unfreeze)) { Freezer.pinAll(this@FreezerActivity, "unfreeze") }))
             if (Build.VERSION.SDK_INT >= 33) addView(sahlButton(getString(R.string.add_tile)) {
                 getSystemService(android.app.StatusBarManager::class.java).requestAddTileService(
                     ComponentName(this@FreezerActivity, FreezeTile::class.java), getString(R.string.fr_t),
@@ -339,108 +416,3 @@ class AppPickerActivity : Activity() {
     private fun isUser(i: ApplicationInfo) = i.flags and ApplicationInfo.FLAG_SYSTEM == 0
 }
 
-// ───────────────────────── Debloater ─────────────────────────
-/** Remove (for this user) or disable pre-installed apps you don't use — and bring them back any time. */
-class DebloatActivity : Activity() {
-    private lateinit var col: LinearLayout
-    private lateinit var list: LinearLayout
-    private var filter = 0      // 0 = system apps, 1 = removed/disabled, 2 = user apps
-    private var query = ""
-    private var all: List<ApplicationInfo> = emptyList()
-    private val listener = Shizuku.OnRequestPermissionResultListener { _, r -> runOnUiThread { if (r == PackageManager.PERMISSION_GRANTED) draw() } }
-
-    override fun onCreate(b: Bundle?) {
-        super.onCreate(b)
-        col = sahlScreen(getString(R.string.db_t))
-        try { Shizuku.addRequestPermissionResultListener(listener) } catch (_: Throwable) { }
-        draw()
-    }
-    override fun onDestroy() { try { Shizuku.removeRequestPermissionResultListener(listener) } catch (_: Throwable) { }; super.onDestroy() }
-
-    private fun draw() {
-        while (col.childCount > 1) col.removeViewAt(1)
-        if (!shizukuGate(col, R.string.db_need_shizuku)) return
-        col.addView(label(getString(R.string.db_warning), 13f, R.color.sub).apply { setPadding(dp(4), 0, dp(4), dp(8)) })
-        val search = EditText(this).apply {
-            hint = getString(R.string.launcher_search); typeface = sahlFont(); setTextColor(getColor(R.color.text)); setSingleLine()
-            addTextChangedListener(object : TextWatcher {
-                override fun afterTextChanged(s: Editable?) { query = s.toString(); show() }
-                override fun beforeTextChanged(s: CharSequence?, a: Int, b: Int, c: Int) {}
-                override fun onTextChanged(s: CharSequence?, a: Int, b: Int, c: Int) {}
-            })
-        }
-        col.addView(search, LinearLayout.LayoutParams(-1, -2))
-        val tabs = listOf(R.string.db_system, R.string.db_removed, R.string.db_user)
-        col.addView(row(*tabs.mapIndexed { i, t -> sahlButton(getString(t)) { filter = i; show() } }.toTypedArray()))
-        list = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
-        col.addView(list)
-        load()
-    }
-
-    private fun load() {
-        list.removeAllViews(); list.addView(label(getString(R.string.working), 14f, R.color.sub))
-        Thread {
-            @Suppress("DEPRECATION")
-            val a = packageManager.getInstalledApplications(PackageManager.MATCH_UNINSTALLED_PACKAGES or PackageManager.MATCH_DISABLED_COMPONENTS)
-                .sortedBy { packageManager.getApplicationLabel(it).toString().lowercase() }
-            runOnUiThread { all = a; show() }
-        }.start()
-    }
-
-    private fun installed(i: ApplicationInfo) = i.flags and ApplicationInfo.FLAG_INSTALLED != 0
-    private fun system(i: ApplicationInfo) = i.flags and ApplicationInfo.FLAG_SYSTEM != 0
-
-    private fun show() {
-        list.removeAllViews()
-        val pm = packageManager
-        val shown = all.filter {
-            when (filter) {
-                0 -> system(it) && installed(it) && !Freezer.isFrozen(this, it.packageName)
-                1 -> !installed(it) || Freezer.isFrozen(this, it.packageName)
-                else -> !system(it) && installed(it)
-            } && (query.isBlank() || pm.getApplicationLabel(it).contains(query, true) || it.packageName.contains(query, true))
-        }
-        list.addView(label(getString(R.string.launcher_count, shown.size), 13f, R.color.sub).apply { setPadding(dp(4), dp(4), 0, dp(4)) })
-        for (a in shown.take(250)) list.addView(appRow(a))
-    }
-
-    private fun appRow(a: ApplicationInfo): View {
-        val pm = packageManager
-        val pkg = a.packageName
-        val gone = !installed(a)
-        val off = Freezer.isFrozen(this, pkg)
-        val locked = pkg in Freezer.protectedPkgs
-        val c = card()
-        val r = LinearLayout(this).apply { gravity = Gravity.CENTER_VERTICAL }
-        r.addView(ImageView(this).apply { setImageDrawable(pm.getApplicationIcon(a)); alpha = if (gone || off) 0.4f else 1f },
-            LinearLayout.LayoutParams(dp(34), dp(34)))
-        val t = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(dp(12), 0, 0, 0) }
-        t.addView(label(pm.getApplicationLabel(a), 15f, bold = true))
-        t.addView(label(pkg + when { gone -> "  · " + getString(R.string.db_is_removed); off -> "  · " + getString(R.string.db_is_disabled); else -> "" },
-            11f, R.color.sub))
-        r.addView(t, LinearLayout.LayoutParams(0, -2, 1f))
-        c.addView(r)
-        when {
-            locked -> c.addView(label("🔒  " + getString(R.string.db_protected), 12f, R.color.sub))
-            gone || off -> c.addView(sahlButton("↩  " + getString(R.string.db_restore)) {
-                run(if (gone) "cmd package install-existing --user 0 $pkg" else "pm enable $pkg")
-            })
-            else -> c.addView(actions(
-                sahlButton(getString(R.string.db_disable)) { run("pm disable-user --user 0 $pkg") },
-                sahlButton(getString(R.string.db_uninstall)) {
-                    sahlDialog(getString(R.string.db_confirm_t, pm.getApplicationLabel(a)), label(getString(R.string.db_confirm), 14f, R.color.sub),
-                        getString(android.R.string.cancel) to { d: android.app.AlertDialog -> d.dismiss() },
-                        getString(R.string.db_uninstall) to { d: android.app.AlertDialog -> d.dismiss(); run("pm uninstall -k --user 0 $pkg") })
-                }))
-        }
-        return LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; addSpaced(c) }
-    }
-
-    private fun run(cmd: String) = Thread {
-        val (code, out) = Shell.run(cmd)
-        runOnUiThread {
-            Toast.makeText(this, if (code == 0) getString(R.string.db_done) else getString(R.string.db_failed) + " " + out.take(120), Toast.LENGTH_LONG).show()
-            load()
-        }
-    }.start()
-}

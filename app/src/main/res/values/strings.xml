@@ -275,4 +275,25 @@ Password: %2$s</string>
     <string name="db_confirm">It disappears for you and stops running. Its files stay on the phone, so you can restore it from the Removed tab at any time.</string>
     <string name="db_done">Done</string>
     <string name="db_failed">Didn\'t work:</string>
+    <string name="fr_done_freeze">❄ %1$d apps frozen</string>
+    <string name="fr_done_unfreeze">☀ %1$d apps unfrozen</string>
+    <string name="fr_skip_charging">Don\'t auto-freeze while charging</string>
+    <string name="fr_mode">Freezing method: %1$s (tap to change)</string>
+    <string name="fr_mode_disable">Disable</string>
+    <string name="fr_mode_suspend">Suspend</string>
+    <string name="fr_mode_help">Disable hides the app fully (most battery saving). Suspend keeps its icon greyed on your home screen.</string>
+    <string name="fr_tile_action">Quick Settings tile does: %1$s (tap to change)</string>
+    <string name="fr_toggle">Freeze ⇄ unfreeze</string>
+    <string name="fr_pin_freeze">Home button: Freeze all</string>
+    <string name="fr_pin_unfreeze">Home button: Unfreeze all</string>
+    <string name="db_suggested">⭐ Suggested</string>
+    <string name="db_select_safe">Tick all ✓ safe</string>
+    <string name="db_restore_all">Restore all</string>
+    <string name="db_nothing">No known bloat found on your phone 👍</string>
+    <string name="db_keep">Keep</string>
+    <string name="db_safe">Safe to remove</string>
+    <string name="db_caution">Careful</string>
+    <string name="db_selected">%1$d selected — tap for actions</string>
+    <string name="db_batch_caution">%1$d of these are not marked safe. Prefer Disable if you are unsure.</string>
+    <string name="db_batch_done">Done: %1$d of %2$d</string>
 </resources>
