@@ -139,4 +139,7 @@
     <string name="vt_live">Scanning with ~90 antivirus engines… %1$ds</string>
     <string name="check_all_links">Check every link I tap</string>
     <string name="links_on">Sahl Tools already checks every link you tap. You can change it here.</string>
+    <string name="always_use">Always use this app</string>
+    <string name="change_opener">Change opening app</string>
+    <string name="opener_reset">Next link will ask which app to use</string>
 </resources>

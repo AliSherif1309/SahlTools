@@ -64,8 +64,8 @@ class LinkPopupActivity : Activity() {
         safetyBox.addView(vtView); safetyBox.addView(vtButtons)
 
         val actions = LinearLayout(this).apply { gravity = Gravity.CENTER; setPadding(0, dp(6), 0, 0) }
-        actions.addView(action(getString(R.string.open), true) { LinkActivity.openInBrowser(this, current()); finish() })
-        actions.addView(action(getString(R.string.open_with), false) { LinkActivity.openInBrowser(this, current(), ask = true) })
+        actions.addView(action(getString(R.string.open), true) { LinkActivity.openInBrowser(this, current()) { finish() } })
+        actions.addView(action(getString(R.string.open_with), false) { LinkActivity.openInBrowser(this, current(), ask = true) { finish() } })
         actions.addView(action(getString(R.string.copy), false) { copy(current()) })
         actions.addView(action(getString(R.string.share), false) { shareText(current()) })
         col.addView(actions)

@@ -119,27 +119,65 @@ class LinkActivity : Activity() {
     private fun openChecked(url: String) = openInBrowser(this, url)
 
     companion object {
-        /** Opens a link in a real browser — never back into Sahl Tools. Remembers the browser you pick. */
-        fun openInBrowser(c: Context, url: String, ask: Boolean = false) {
-            val view = Intent(Intent.ACTION_VIEW, Uri.parse(url)).addCategory(Intent.CATEGORY_BROWSABLE)
-            val browsers = c.packageManager.queryIntentActivities(view, 0)
+        /**
+         * Opens a link outside Sahl Tools. Uses your remembered app if you chose "Always";
+         * otherwise shows Sahl's own picker with every browser and app that can open it.
+         */
+        fun openInBrowser(c: Context, url: String, ask: Boolean = false, done: () -> Unit = {}) {
+            val view = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+            val pm = c.packageManager
+            // MATCH_ALL: without it Android lists only the default opener (Sahl Tools itself)
+            val apps = pm.queryIntentActivities(view, android.content.pm.PackageManager.MATCH_ALL)
                 .filter { it.activityInfo.packageName != c.packageName }
+                .distinctBy { it.activityInfo.packageName }
+                .sortedWith(compareBy({ !isBrowser(c, it.activityInfo.packageName) }, { it.loadLabel(pm).toString() }))
+            fun go(p: android.content.pm.ResolveInfo) = try {
+                c.startActivity(Intent(view).setComponent(ComponentName(p.activityInfo.packageName, p.activityInfo.name))
+                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+            } catch (_: Exception) { c.copy(url) }.also { done() }
             val saved = Tools.prefs(c).getString("browser", null)
-            val pick = if (ask) null else browsers.firstOrNull { it.activityInfo.packageName == saved } ?: browsers.singleOrNull()
-            fun go(p: android.content.pm.ResolveInfo) = c.startActivity(Intent(view)
-                .setComponent(ComponentName(p.activityInfo.packageName, p.activityInfo.name)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+            val remembered = apps.firstOrNull { it.activityInfo.packageName == saved }
             when {
-                pick != null -> go(pick)
-                browsers.isEmpty() -> c.copy(url)
-                else -> {
-                    val pm = c.packageManager
-                    AlertDialog.Builder(c).setTitle(R.string.pick_browser)
-                        .setItems(browsers.map { it.loadLabel(pm) }.toTypedArray()) { _, i ->
-                            if (!ask) Tools.prefs(c).edit().putString("browser", browsers[i].activityInfo.packageName).apply()
-                            go(browsers[i])
-                        }.show()
+                apps.isEmpty() -> c.copy(url)
+                !ask && remembered != null -> go(remembered)
+                else -> picker(c, url, apps) { p, always ->
+                    if (always) Tools.prefs(c).edit().putString("browser", p.activityInfo.packageName).apply()
+                    go(p)
                 }
             }
         }
+
+        private fun isBrowser(c: Context, pkg: String) = c.packageManager.queryIntentActivities(
+            Intent(Intent.ACTION_VIEW, Uri.parse("https://example.com")), android.content.pm.PackageManager.MATCH_ALL)
+            .any { it.activityInfo.packageName == pkg }
+
+        /** Sahl's own "Open with" sheet: app icons and names, plus "Always use this app". */
+        private fun picker(c: Context, url: String, apps: List<android.content.pm.ResolveInfo>,
+                           chosen: (android.content.pm.ResolveInfo, Boolean) -> Unit) {
+            val pm = c.packageManager
+            val list = LinearLayout(c).apply { orientation = LinearLayout.VERTICAL; setPadding(c.dp(8), c.dp(4), c.dp(8), 0) }
+            val always = android.widget.CheckBox(c).apply {
+                text = c.getString(R.string.always_use); typeface = c.sahlFont(); setTextColor(c.getColor(R.color.text))
+            }
+            list.addView(c.label(Uri.parse(url).host ?: url, 13f, R.color.sub).apply { setPadding(c.dp(12), 0, 0, c.dp(6)) })
+            var dialog: AlertDialog? = null
+            for (p in apps) {
+                val row = LinearLayout(c).apply {
+                    gravity = Gravity.CENTER_VERTICAL; setPadding(c.dp(12), c.dp(10), c.dp(12), c.dp(10))
+                    isClickable = true; background = c.getDrawable(android.R.drawable.list_selector_background)
+                    setOnClickListener { dialog?.dismiss(); chosen(p, always.isChecked) }
+                }
+                row.addView(android.widget.ImageView(c).apply { setImageDrawable(p.loadIcon(pm)) }, LinearLayout.LayoutParams(c.dp(36), c.dp(36)))
+                row.addView(c.label(p.loadLabel(pm), 16f).apply { setPadding(c.dp(14), 0, 0, 0) })
+                list.addView(row)
+            }
+            list.addView(always)
+            dialog = AlertDialog.Builder(c).setTitle(R.string.open_with)
+                .setView(android.widget.ScrollView(c).apply { addView(list) })
+                .setNegativeButton(android.R.string.cancel, null).show()
+        }
+
+        /** Forget the remembered app so the picker shows again. */
+        fun forgetBrowser(c: Context) = Tools.prefs(c).edit().remove("browser").apply()
     }
 }

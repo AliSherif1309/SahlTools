@@ -216,7 +216,8 @@ class MainActivity : Activity() {
             R.string.add_tile to { addTile(ScanTile::class.java, R.string.scan_t, R.drawable.ic_scan) })
         add(R.string.link_t, R.string.link_d, R.drawable.ic_link,
             R.string.open to { startActivity(Intent(this, LinkActivity::class.java)) },
-            R.string.check_all_links to { askBrowserRole() })
+            R.string.check_all_links to { askBrowserRole() },
+            R.string.change_opener to { LinkActivity.forgetBrowser(this); Toast.makeText(this, R.string.opener_reset, Toast.LENGTH_SHORT).show() })
         add(R.string.photo_t, R.string.photo_d, R.drawable.ic_photo,
             R.string.pick_photos to { startActivity(Intent(this, PickPhotosActivity::class.java)) })
         add(R.string.save_t, R.string.save_d, R.drawable.ic_save)

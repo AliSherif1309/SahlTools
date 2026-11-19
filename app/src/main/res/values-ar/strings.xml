@@ -139,4 +139,7 @@
     <string name="vt_live">جارٍ الفحص بحوالي ٩٠ برنامج مكافحة فيروسات… %1$d ث</string>
     <string name="check_all_links">افحص كل رابط أضغط عليه</string>
     <string name="links_on">سهل للأدوات يفحص بالفعل كل رابط تضغطه. يمكنك تغيير ذلك من هنا.</string>
+    <string name="always_use">استخدم هذا التطبيق دائمًا</string>
+    <string name="change_opener">تغيير تطبيق الفتح</string>
+    <string name="opener_reset">سيسألك الرابط التالي عن التطبيق المطلوب</string>
 </resources>
