@@ -44,6 +44,33 @@ object LinkSafety {
         return w
     }
 
+    private val fileTypes = mapOf(
+        "apk" to "Android app (APK)", "apks" to "Android app (APK)", "xapk" to "Android app (APK)", "aab" to "Android app",
+        "exe" to "Windows program", "msi" to "Windows installer", "bat" to "Windows script", "scr" to "Windows program",
+        "zip" to "ZIP archive", "rar" to "RAR archive", "7z" to "7z archive", "dmg" to "Mac installer",
+        "pdf" to "PDF document", "doc" to "Word document", "docm" to "Word document with macros", "xls" to "Excel file",
+        "xlsm" to "Excel file with macros", "js" to "Script", "vbs" to "Script", "jar" to "Java program", "iso" to "Disk image")
+
+    /** If the link downloads a file instead of opening a page, says what kind. Blocking (asks the server). */
+    fun download(url: String): String? {
+        val ext = Uri.parse(url).lastPathSegment?.substringAfterLast('.', "")?.lowercase()
+        fileTypes[ext]?.let { return it }
+        return try {
+            val con = (URL(url).openConnection() as HttpURLConnection).apply {
+                requestMethod = "HEAD"; connectTimeout = 6000; readTimeout = 6000; setRequestProperty("User-Agent", "Mozilla/5.0")
+            }
+            val type = con.contentType?.lowercase() ?: ""
+            val disp = con.getHeaderField("Content-Disposition")?.lowercase() ?: ""
+            con.disconnect()
+            when {
+                "android.package-archive" in type -> "Android app (APK)"
+                "attachment" in disp -> fileTypes[disp.substringAfterLast('.').trim('"', ' ', ';')] ?: "File download"
+                "octet-stream" in type || "x-msdownload" in type -> "File download"
+                else -> null
+            }
+        } catch (_: Exception) { null }
+    }
+
     fun key(c: Context) = Tools.prefs(c).getString("vtKey", "") ?: ""
 
     /** Website search — works without a key. */

@@ -28,6 +28,7 @@ import android.widget.Toast
 class MainActivity : Activity() {
     private val switches = HashMap<String, Switch>()
     private var soundBtn: Button? = null
+    private var linkOffBar: TextView? = null
     private lateinit var font: Typeface
     private lateinit var updateBar: TextView
     private val receiver = object : BroadcastReceiver() {
@@ -58,6 +59,12 @@ class MainActivity : Activity() {
             setPadding(dp(14), dp(10), dp(14), dp(10)); gravity = Gravity.CENTER
         }
         list.addView(updateBar, LinearLayout.LayoutParams(-1, -2).apply { bottomMargin = dp(12) })
+        linkOffBar = text("⚠  " + getString(R.string.links_off), 14f, R.color.card, true).apply {
+            visibility = View.GONE; setPadding(dp(14), dp(10), dp(14), dp(10)); gravity = Gravity.CENTER
+            background = GradientDrawable().apply { cornerRadius = dp(14).toFloat(); setColor(0xFFC62828.toInt()) }
+            setOnClickListener { askBrowserRole() }
+        }
+        list.addView(linkOffBar, LinearLayout.LayoutParams(-1, -2).apply { bottomMargin = dp(12) })
         Tools.prefs(this).getString("crash", null)?.let { report ->
             val c = card()
             c.addView(text(getString(R.string.crash_t), 16f, R.color.text, true))
@@ -176,6 +183,7 @@ class MainActivity : Activity() {
 
     /** Makes Sahl Tools the link opener, so every tapped link is checked first. */
     private fun askBrowserRole() {
+        Tools.prefs(this).edit().putBoolean("wantLinks", true).apply()
         if (Build.VERSION.SDK_INT >= 29) {
             val rm = getSystemService(android.app.role.RoleManager::class.java)
             if (rm.isRoleHeld(android.app.role.RoleManager.ROLE_BROWSER)) {
@@ -189,7 +197,15 @@ class MainActivity : Activity() {
         startActivity(Intent(android.provider.Settings.ACTION_MANAGE_DEFAULT_APPS_SETTINGS))
     }
 
+    /** True when Sahl Tools is the link opener (every tapped link is checked). */
+    private fun linksChecked(): Boolean = Build.VERSION.SDK_INT >= 29 &&
+        getSystemService(android.app.role.RoleManager::class.java).isRoleHeld(android.app.role.RoleManager.ROLE_BROWSER)
+
     private fun sync() {
+        // Show the red bar only after the user turned link checking on once (then lost it, e.g. after an update)
+        val wanted = Tools.prefs(this).getBoolean("wantLinks", false)
+        if (linksChecked()) Tools.prefs(this).edit().putBoolean("wantLinks", true).apply()
+        linkOffBar?.visibility = if (wanted && !linksChecked()) View.VISIBLE else View.GONE
         for ((k, s) in switches) s.isChecked = Tools.isOn(this, k)
         soundBtn?.text = getString(R.string.sound_now, SoundMode.name(this))
     }

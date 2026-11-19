@@ -191,6 +191,20 @@ class LinkPopupActivity : Activity() {
         val url = current()
         val w = LinkSafety.warnings(url)
         val box = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
+        // Downloads (APK, EXE, ZIP …) get a big warning before anything opens
+        val dl = label("", 15f, R.color.card, true).apply {
+            visibility = View.GONE; setPadding(dp(12), dp(8), dp(12), dp(8))
+            background = android.graphics.drawable.GradientDrawable().apply { cornerRadius = dp(12).toFloat(); setColor(0xFFC62828.toInt()) }
+        }
+        box.addView(dl)
+        Thread {
+            val kind = LinkSafety.download(url)
+            if (kind != null) runOnUiThread {
+                dl.text = "⬇⚠  " + getString(R.string.dl_warning, kind)
+                dl.visibility = View.VISIBLE
+                banner.text = "⬇  " + getString(R.string.dl_banner, kind)
+            }
+        }.start()
         if (w.isEmpty()) box.addView(label("✓  " + getString(R.string.ws_none), 14f))
         else for (r in w) box.addView(label("⚠  " + getString(r), 14f).apply { setTextColor(0xFFD08A00.toInt()) })
         safetyBox.addView(box, 0)

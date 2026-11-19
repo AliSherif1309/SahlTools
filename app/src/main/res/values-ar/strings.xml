@@ -158,4 +158,7 @@
     <string name="vt_wrong_shape">لا يبدو هذا مفتاح VirusTotal (٦٤ حرفًا ورقمًا)</string>
     <string name="vt_testing">جارٍ اختبار المفتاح…</string>
     <string name="vt_key_ok">✓ المفتاح يعمل — تُفحص الروابط الآن تلقائيًا من الفيروسات</string>
+    <string name="dl_warning">هذا الرابط يقوم بتنزيل ملف: %1$s. افتحه فقط إذا كنت تثق بالمرسل.</string>
+    <string name="dl_banner">رابط تنزيل: %1$s — ليس صفحة ويب</string>
+    <string name="links_off">فحص الروابط متوقف — الروابط تُفتح بدون سهل. اضغط لإعادة تشغيله.</string>
 </resources>

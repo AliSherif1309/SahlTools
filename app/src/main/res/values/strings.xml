@@ -158,4 +158,7 @@
     <string name="vt_wrong_shape">That doesn\'t look like a VirusTotal key (64 letters and numbers)</string>
     <string name="vt_testing">Testing the key…</string>
     <string name="vt_key_ok">✓ Key works — links are now scanned for viruses automatically</string>
+    <string name="dl_warning">This link DOWNLOADS a file: %1$s. Open it only if you trust who sent it.</string>
+    <string name="dl_banner">Download link: %1$s — not a web page</string>
+    <string name="links_off">Link checking is OFF — links open without Sahl. Tap to turn it back on.</string>
 </resources>
