@@ -229,6 +229,8 @@ class MainActivity : Activity() {
         add(R.string.save_t, R.string.save_d, R.drawable.ic_save)
         add(R.string.wifi_t, R.string.wifi_d, R.drawable.ic_wifi,
             R.string.open to { startActivity(Intent(this, WifiActivity::class.java)) })
+        add(R.string.cg_t, R.string.cg_d, R.drawable.ic_shield,
+            R.string.open to { startActivity(Intent(this, CallGuardActivity::class.java)) })
         add(R.string.fr_t, R.string.fr_d, R.drawable.ic_freeze,
             R.string.open to { startActivity(Intent(this, FreezerActivity::class.java)) },
             R.string.add_tile to { addTile(FreezeTile::class.java, R.string.fr_t, R.drawable.ic_freeze) })
