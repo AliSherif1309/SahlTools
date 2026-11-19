@@ -121,6 +121,9 @@
                 <data android:mimeType="*/*" />
             </intent-filter>
         </activity>
+        <service android:name=".CustomTabsService" android:exported="true">
+            <intent-filter><action android:name="android.support.customtabs.action.CustomTabsService" /></intent-filter>
+        </service>
         <receiver android:name=".InstallResult" android:exported="false" />
     </application>
 </manifest>
