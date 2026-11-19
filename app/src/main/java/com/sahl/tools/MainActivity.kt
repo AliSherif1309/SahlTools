@@ -238,6 +238,14 @@ class MainActivity : Activity() {
         add(R.string.save_t, R.string.save_d, R.drawable.ic_save)
         add(R.string.wifi_t, R.string.wifi_d, R.drawable.ic_wifi,
             R.string.open to { startActivity(Intent(this, WifiActivity::class.java)) })
+        add(R.string.speed_t, R.string.speed_d, R.drawable.ic_speed,
+            R.string.open to { startActivity(Intent(this, SpeedActivity::class.java)) })
+        add(R.string.data_t, R.string.data_d, R.drawable.ic_data,
+            R.string.open to { startActivity(Intent(this, DataActivity::class.java)) })
+        add(R.string.launcher_t, R.string.launcher_d, R.drawable.ic_apps,
+            R.string.open to { startActivity(Intent(this, LauncherActivity::class.java)) })
+        add(R.string.light_t, R.string.light_d, R.drawable.ic_light,
+            R.string.open to { startActivity(Intent(this, ScreenLightActivity::class.java)) })
         return col
     }
 

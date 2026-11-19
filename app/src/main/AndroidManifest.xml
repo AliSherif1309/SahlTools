@@ -7,6 +7,8 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS" tools:ignore="ProtectedPermissions" />
+    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" tools:ignore="QueryAllPackagesPermission" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -124,6 +126,11 @@
         <service android:name=".CustomTabsService" android:exported="true">
             <intent-filter><action android:name="android.support.customtabs.action.CustomTabsService" /></intent-filter>
         </service>
+        <activity android:name=".SpeedActivity" android:exported="false" android:label="@string/speed_t" />
+        <activity android:name=".DataActivity" android:exported="false" android:label="@string/data_t" />
+        <activity android:name=".LauncherActivity" android:exported="false" android:label="@string/launcher_t" />
+        <activity android:name=".ScreenLightActivity" android:exported="false" android:label="@string/light_t"
+            android:theme="@android:style/Theme.Material.NoActionBar.Fullscreen" />
         <receiver android:name=".InstallResult" android:exported="false" />
     </application>
 </manifest>

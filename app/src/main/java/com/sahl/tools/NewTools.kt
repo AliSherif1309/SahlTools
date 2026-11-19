@@ -194,7 +194,7 @@ class DataActivity : Activity() {
     private fun allowed(): Boolean {
         val ops = getSystemService(AppOpsManager::class.java)
         val mode = if (Build.VERSION.SDK_INT >= 29) ops.unsafeCheckOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS, Process.myUid(), packageName)
-                   else @Suppress("DEPRECATION") ops.checkOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS, Process.myUid(), packageName)
+                   else ops.checkOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS, Process.myUid(), packageName)
         return mode == AppOpsManager.MODE_ALLOWED
     }
 
