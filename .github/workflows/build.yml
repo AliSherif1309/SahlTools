@@ -1,0 +1,42 @@
+name: Build and release Sahl Tools
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Restore signing key
+        env:
+          KEYSTORE_B64: ${{ secrets.KEYSTORE_B64 }}
+        run: |
+          if [ -z "$KEYSTORE_B64" ]; then echo "::error::Add the KEYSTORE_B64 and KEYSTORE_PASS secrets first"; exit 1; fi
+          echo "$KEYSTORE_B64" | base64 -d > $RUNNER_TEMP/release.keystore
+          echo "KEYSTORE_FILE=$RUNNER_TEMP/release.keystore" >> $GITHUB_ENV
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.9"
+      - run: gradle assembleRelease --no-daemon
+        env:
+          KEYSTORE_PASS: ${{ secrets.KEYSTORE_PASS }}
+      - name: Name the APK and notes
+        env:
+          MSG: ${{ github.event.head_commit.message }}
+        run: |
+          cp app/build/outputs/apk/release/*.apk SahlTools-v1.${{ github.run_number }}.apk
+          printf '%s\n' "$MSG" | head -n 1 > notes.txt
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.${{ github.run_number }}
+          name: Sahl Tools v1.${{ github.run_number }}
+          body_path: notes.txt
+          files: SahlTools-v1.${{ github.run_number }}.apk
+          make_latest: true

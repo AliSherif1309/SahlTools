@@ -1,0 +1,25 @@
+<resources>
+    <string name="app_name">Sahl Tools</string>
+    <string name="tagline">Your everyday tools in one place</string>
+    <string name="screen_t">Keep Screen On</string>
+    <string name="screen_d">Stops the screen from turning off. Your normal timeout comes back when you turn it off.</string>
+    <string name="volume_t">Volume Lock</string>
+    <string name="volume_d">Locks media, ring, notification and alarm volume at their current levels.</string>
+    <string name="touch_t">Touch Lock</string>
+    <string name="touch_d">Blocks all touches — great for videos or handing the phone to a child. Tap the lock 3 times to unlock.</string>
+    <string name="timer_t">Floating Timer</string>
+    <string name="timer_d">A small stopwatch that floats over any app. Tap: start/pause · Hold: reset · Drag: move.</string>
+    <string name="add_tile">Add to Quick Settings</string>
+    <string name="minutes">Minutes</string>
+    <string name="countdown">Start countdown</string>
+    <string name="tile_added">Added to Quick Settings</string>
+    <string name="need_settings">Allow \"Modify system settings\" for Sahl Tools, then come back</string>
+    <string name="need_overlay">Allow \"Display over other apps\" for Sahl Tools, then come back</string>
+    <string name="tap3">Tap 3 times to unlock</string>
+    <string name="unlock">Unlock</string>
+    <string name="stop">Stop</string>
+    <string name="running">is on</string>
+    <string name="channel">Running tools</string>
+    <string name="update_available">Update %1$s available — tap to download</string>
+    <string name="battery_hint">Tip: on Honor, set Sahl Tools to \"Manage manually\" in Battery → App launch so locks are not stopped.</string>
+</resources>

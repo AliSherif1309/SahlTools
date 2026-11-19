@@ -1,0 +1,25 @@
+<resources>
+    <string name="app_name">سهل للأدوات</string>
+    <string name="tagline">أدواتك اليومية في مكان واحد</string>
+    <string name="screen_t">إبقاء الشاشة مضاءة</string>
+    <string name="screen_d">يمنع الشاشة من الانطفاء، وتعود المهلة المعتادة عند الإيقاف.</string>
+    <string name="volume_t">قفل الصوت</string>
+    <string name="volume_d">يثبّت مستوى صوت الوسائط والرنين والإشعارات والمنبّه على مستواه الحالي.</string>
+    <string name="touch_t">قفل اللمس</string>
+    <string name="touch_d">يمنع كل اللمسات — مناسب لمشاهدة الفيديو أو عند إعطاء الهاتف لطفل. اضغط على القفل ٣ مرات لفتحه.</string>
+    <string name="timer_t">المؤقّت العائم</string>
+    <string name="timer_d">ساعة إيقاف صغيرة تطفو فوق أي تطبيق. ضغطة: تشغيل/إيقاف مؤقت · ضغطة مطوّلة: تصفير · اسحب لتحريكها.</string>
+    <string name="add_tile">أضِف إلى الإعدادات السريعة</string>
+    <string name="minutes">دقائق</string>
+    <string name="countdown">ابدأ العدّ التنازلي</string>
+    <string name="tile_added">أُضيفت إلى الإعدادات السريعة</string>
+    <string name="need_settings">اسمح بـ\"تعديل إعدادات النظام\" لسهل للأدوات ثم ارجع</string>
+    <string name="need_overlay">اسمح بـ\"الظهور فوق التطبيقات الأخرى\" لسهل للأدوات ثم ارجع</string>
+    <string name="tap3">اضغط ٣ مرات لفتح القفل</string>
+    <string name="unlock">فتح القفل</string>
+    <string name="stop">إيقاف</string>
+    <string name="running">يعمل</string>
+    <string name="channel">الأدوات العاملة</string>
+    <string name="update_available">التحديث %1$s متوفّر — اضغط للتنزيل</string>
+    <string name="battery_hint">نصيحة: في هونر اجعل سهل للأدوات على \"إدارة يدوية\" من البطارية ← تشغيل التطبيقات حتى لا تتوقف الأقفال.</string>
+</resources>

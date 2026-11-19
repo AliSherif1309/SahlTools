@@ -1,0 +1,9 @@
+<resources>
+    <color name="emerald">#1E8A70</color>
+    <color name="emerald_dark">#0A2A23</color>
+    <color name="gold">#E2C25B</color>
+    <color name="bg">#0F1715</color>
+    <color name="text">#EDEBE4</color>
+    <color name="sub">#9BA8A3</color>
+    <color name="card">#18221F</color>
+</resources>
