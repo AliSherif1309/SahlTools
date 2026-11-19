@@ -30,7 +30,6 @@ import android.view.View
 import android.view.WindowManager
 import android.widget.LinearLayout
 import android.widget.Toast
-import com.google.zxing.integration.android.IntentIntegrator
 import java.net.HttpURLConnection
 import java.net.URL
 
@@ -103,8 +102,13 @@ class DimService : Service() {
             PixelFormat.TRANSLUCENT)
         if (Build.VERSION.SDK_INT >= 28) params.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
         params.alpha = level(this)
-        getSystemService(WindowManager::class.java).addView(v, params)
-        layer = v
+        try {
+            getSystemService(WindowManager::class.java).addView(v, params)
+            layer = v
+        } catch (e: Exception) {
+            Tools.prefs(this).edit().putString("crash", "Dimmer: " + android.util.Log.getStackTraceString(e).take(3000)).apply()
+            stopSelf()
+        }
         Tools.setOn(this, Tools.DIM, true)
     }
 
@@ -127,36 +131,18 @@ class DimService : Service() {
     }
 }
 
-// ───────────────────────── QR & barcode scanner ─────────────────────────
-class ScanActivity : Activity() {
-    override fun onCreate(b: Bundle?) {
-        super.onCreate(b)
-        IntentIntegrator(this).setPrompt(getString(R.string.scan_prompt)).setBeepEnabled(false).setOrientationLocked(false).initiateScan()
-    }
-
-    @Deprecated("Activity result API")
-    override fun onActivityResult(req: Int, res: Int, data: Intent?) {
-        val r = IntentIntegrator.parseActivityResult(req, res, data)
-        val text = r?.contents
-        if (text == null) { finish(); return }
-        val col = sahlScreen(getString(R.string.scan_t))
-        col.addSpaced(card().apply {
-            addView(label(r.formatName ?: "", 13f, R.color.sub))
-            addView(label(text, 18f).apply { setTextIsSelectable(true) })
-            addView(row(sahlButton(getString(R.string.copy)) { copy(text) },
-                sahlButton(getString(R.string.share)) { shareText(text) },
-                sahlButton(getString(R.string.open)) { openLink(text) }))
-        })
-        col.addView(sahlButton(getString(R.string.scan_again)) { recreate() })
-    }
-}
-
 // ───────────────────────── Link cleaner ─────────────────────────
 object LinkCleaner {
     private val junk = Regex("^(utm_.*|fbclid|gclid|dclid|gbraid|wbraid|msclkid|mc_eid|mc_cid|igshid|igsh|si|feature|ref|ref_src|ref_url|" +
         "_hsenc|_hsmi|yclid|twclid|ttclid|s_cid|spm|scm|share_id|sharer|smid|pp|xmt|mibextid|trk|trkCampaign|campaign_id|ad_id)$", RegexOption.IGNORE_CASE)
 
-    fun findUrl(text: String) = Regex("https?://\\S+").find(text)?.value?.trimEnd('.', ',', ')', '"', '\'')
+    fun findUrl(text: String) = findAll(text).firstOrNull()
+
+    /** Every link in a piece of text; "www.site.com" style links get https:// added. */
+    fun findAll(text: String) = Regex("(https?://|www\\.)[^\\s<>\"']+", RegexOption.IGNORE_CASE).findAll(text)
+        .map { it.value.trimEnd('.', ',', ')', ']', '!', '?', ';') }
+        .map { if (it.startsWith("www.", true)) "https://$it" else it }
+        .distinct().take(20).toList()
 
     /** Follows short links (bit.ly, t.co …) to the real address. Blocking. */
     fun expand(url: String): String {
@@ -181,122 +167,6 @@ object LinkCleaner {
         val b = uri.buildUpon().clearQuery()
         for (k in keep) for (v in uri.getQueryParameters(k)) b.appendQueryParameter(k, v)
         return b.build().toString().removeSuffix("?")
-    }
-}
-
-class LinkActivity : Activity() {
-    override fun onCreate(b: Bundle?) {
-        super.onCreate(b)
-        val input = intent.getStringExtra(Intent.EXTRA_TEXT) ?: intent.dataString ?: ""
-        val col = sahlScreen(getString(R.string.link_t))
-        val url = LinkCleaner.findUrl(input)
-        if (url == null) { col.addView(label(getString(R.string.no_link), 16f, R.color.sub)); return }
-        val result = label(getString(R.string.working), 17f).apply { setTextIsSelectable(true) }
-        val before = label(url, 13f, R.color.sub)
-        val buttons = LinearLayout(this).apply { visibility = View.GONE }
-        col.addSpaced(card().apply { addView(before); addView(result); addView(buttons) })
-        Thread {
-            val expanded = try { LinkCleaner.expand(url) } catch (_: Exception) { url }
-            val clean = LinkCleaner.clean(expanded)
-            runOnUiThread {
-                result.text = clean
-                buttons.addView(sahlButton(getString(R.string.copy)) { copy(clean) })
-                buttons.addView(sahlButton(getString(R.string.share)) { shareText(clean) })
-                buttons.addView(sahlButton(getString(R.string.open)) { openLink(clean) })
-                buttons.visibility = View.VISIBLE
-                col.addSpaced(safetyCard(clean))
-            }
-        }.start()
-    }
-
-    /** Warning signs found on the phone, plus a VirusTotal scan. */
-    private fun safetyCard(url: String) = card().apply {
-        addView(label(getString(R.string.safety_t), 18f, R.color.emerald, true))
-        val w = LinkSafety.warnings(url)
-        if (w.isEmpty()) addView(label("✓  " + getString(R.string.ws_none), 15f).apply { setPadding(0, dp(6), 0, dp(6)) })
-        else for (r in w) addView(label("⚠  " + getString(r), 15f).apply { setPadding(0, dp(4), 0, dp(4)) })
-        val vt = label("", 16f, bold = true).apply { setPadding(0, dp(6), 0, 0) }
-        addView(vt)
-        val scan = sahlButton(getString(R.string.vt_scan)) {}
-        scan.setOnClickListener {
-            val key = LinkSafety.key(this@LinkActivity)
-            if (key.isEmpty()) { LinkSafety.askKey(this@LinkActivity) { scan.performClick() }; return@setOnClickListener }
-            vt.setTextColor(getColor(R.color.text)); vt.text = getString(R.string.vt_scanning); scan.isEnabled = false
-            Thread {
-                val msg: String; val bad: Boolean
-                try {
-                    val v = LinkSafety.virusTotal(key, url)
-                    when {
-                        v == null -> { msg = getString(R.string.vt_slow); bad = false }
-                        v.malicious + v.suspicious > 0 -> { msg = "⛔  " + getString(R.string.vt_bad, v.malicious + v.suspicious, v.total); bad = true }
-                        else -> { msg = "✓  " + getString(R.string.vt_clean, v.total); bad = false }
-                    }
-                } catch (e: SecurityException) {
-                    runOnUiThread { scan.isEnabled = true; vt.text = getString(R.string.vt_bad_key); LinkSafety.askKey(this@LinkActivity) { scan.performClick() } }
-                    return@Thread
-                } catch (e: Exception) {
-                    runOnUiThread { scan.isEnabled = true; vt.text = getString(R.string.vt_error) }
-                    return@Thread
-                }
-                runOnUiThread {
-                    scan.isEnabled = true; vt.text = msg
-                    vt.setTextColor(if (bad) 0xFFC62828.toInt() else getColor(R.color.emerald))
-                }
-            }.start()
-        }
-        addView(row(scan, sahlButton(getString(R.string.vt_site)) { openLink(LinkSafety.vtWebsite(url)) }))
-        addView(sahlButton(getString(R.string.vt_key_title)) { LinkSafety.askKey(this@LinkActivity) {} })
-        if (LinkSafety.key(this@LinkActivity).isNotEmpty()) scan.performClick()
-    }
-}
-
-// ───────────────────────── Photo info remover ─────────────────────────
-class PhotoActivity : Activity() {
-    override fun onCreate(b: Bundle?) {
-        super.onCreate(b)
-        val uris = ArrayList<Uri>()
-        @Suppress("DEPRECATION")
-        when (intent.action) {
-            Intent.ACTION_SEND -> intent.getParcelableExtra<Uri>(Intent.EXTRA_STREAM)?.let { uris.add(it) }
-            Intent.ACTION_SEND_MULTIPLE -> intent.getParcelableArrayListExtra<Uri>(Intent.EXTRA_STREAM)?.let { uris.addAll(it) }
-        }
-        intent.clipData?.let { cd -> for (i in 0 until cd.itemCount) cd.getItemAt(i).uri?.let { if (it !in uris) uris.add(it) } }
-        val col = sahlScreen(getString(R.string.photo_t))
-        if (uris.isEmpty()) { col.addView(label(getString(R.string.photo_how), 16f, R.color.sub)); return }
-        val status = label(getString(R.string.working), 16f)
-        col.addSpaced(card().apply { addView(status) })
-        Thread {
-            val out = ArrayList<Uri>()
-            for (u in uris) try { clean(u)?.let { out.add(it) } } catch (_: Exception) { }
-            runOnUiThread {
-                status.text = getString(R.string.photo_done, out.size)
-                if (out.isNotEmpty()) col.addView(sahlButton(getString(R.string.share)) {
-                    startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND_MULTIPLE).setType("image/jpeg")
-                        .putParcelableArrayListExtra(Intent.EXTRA_STREAM, out).addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION), null))
-                })
-            }
-        }.start()
-    }
-
-    /** Re-draws the photo upright and saves a fresh JPEG — location, camera and date details are left behind. */
-    private fun clean(src: Uri): Uri? {
-        val rotation = contentResolver.openInputStream(src)?.use {
-            when (ExifInterface(it).getAttributeInt(ExifInterface.TAG_ORIENTATION, 1)) {
-                ExifInterface.ORIENTATION_ROTATE_90 -> 90f; ExifInterface.ORIENTATION_ROTATE_180 -> 180f
-                ExifInterface.ORIENTATION_ROTATE_270 -> 270f; else -> 0f
-            }
-        } ?: 0f
-        var bmp = contentResolver.openInputStream(src)?.use { BitmapFactory.decodeStream(it) } ?: return null
-        if (rotation != 0f) bmp = Bitmap.createBitmap(bmp, 0, 0, bmp.width, bmp.height, Matrix().apply { postRotate(rotation) }, true)
-        val v = ContentValues().apply {
-            put(MediaStore.Images.Media.DISPLAY_NAME, "Sahl_" + System.currentTimeMillis() + ".jpg")
-            put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
-            if (Build.VERSION.SDK_INT >= 29) put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + "/Sahl Clean")
-        }
-        val dst = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, v) ?: return null
-        contentResolver.openOutputStream(dst)?.use { bmp.compress(Bitmap.CompressFormat.JPEG, 95, it) }
-        bmp.recycle()
-        return dst
     }
 }
 

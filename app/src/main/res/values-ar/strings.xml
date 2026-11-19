@@ -48,7 +48,7 @@
     <string name="open">فتح</string>
     <string name="copied">تم النسخ</string>
     <string name="link_t">منظّف الروابط</string>
-    <string name="link_d">شارك رابطًا مع سهل للأدوات (أو الصقه) — يفتح الروابط المختصرة ويزيل رموز التتبّع ويفحص الرابط من البرمجيات الخبيثة والتصيّد.</string>
+    <string name="link_d">الصق الروابط أو شاركها هنا أو اضغط أي رابط واختر سهل للأدوات — يفتح الروابط المختصرة ويزيل رموز التتبّع ويفحص الرابط من البرمجيات الخبيثة والتصيّد.</string>
     <string name="paste_link">لصق رابط</string>
     <string name="no_link">لا يوجد رابط. انسخ رابطًا أولًا أو شاركه مع سهل للأدوات.</string>
     <string name="working">جارٍ العمل…</string>
@@ -100,4 +100,28 @@
     <string name="vt_key_how">مجاني: سجّل في virustotal.com، ثم افتح ملفك الشخصي ← \"API key\"، انسخه والصقه هنا. يُحفظ على هذا الهاتف فقط.</string>
     <string name="save_key">حفظ</string>
     <string name="get_key">احصل على مفتاح مجاني</string>
+    <string name="paste_hint">الصق رابطًا أو أكثر هنا…</string>
+    <string name="check">فحص</string>
+    <string name="clear">مسح</string>
+    <string name="was_short">تم فتح الرابط المختصر إلى عنوانه الحقيقي</string>
+    <string name="tracking_removed">تمت إزالة رموز التتبّع</string>
+    <string name="already_clean">لا توجد رموز تتبّع</string>
+    <string name="pick_browser">فتح الروابط باستخدام</string>
+    <string name="need_camera">يحتاج سهل للأدوات إلى الكاميرا للمسح. اسمح بها ثم حاول مجددًا.</string>
+    <string name="scan_failed">تعذّر تشغيل الماسح.</string>
+    <string name="check_link">فحص الرابط</string>
+    <string name="nothing_hidden">لا توجد بيانات مخفية — حُفظت نسخة نظيفة على أي حال</string>
+    <string name="share_clean">مشاركة الصور النظيفة</string>
+    <string name="ex_location">الموقع: %1$s</string>
+    <string name="ex_camera">الهاتف/الكاميرا: %1$s</string>
+    <string name="ex_lens">العدسة: %1$s</string>
+    <string name="ex_date">تاريخ الالتقاط: %1$s</string>
+    <string name="ex_settings">إعدادات الكاميرا: %1$s</string>
+    <string name="ex_software">البرنامج: %1$s</string>
+    <string name="ex_owner">المالك/المؤلف: %1$s</string>
+    <string name="ex_id">معرّف فريد للصورة</string>
+    <string name="ex_total">تمت إزالة %1$d من البيانات المخفية إجمالًا</string>
+    <string name="crash_t">حدث خطأ في المرة السابقة</string>
+    <string name="crash_copy">نسخ التفاصيل</string>
+    <string name="crash_dismiss">إخفاء</string>
 </resources>

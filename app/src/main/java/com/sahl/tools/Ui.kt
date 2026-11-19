@@ -64,5 +64,6 @@ fun Context.shareText(text: String) = startActivity(Intent.createChooser(
     Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, text), null))
 
 fun Context.openLink(text: String) = try {
-    startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(text)))
+    if (text.startsWith("http", true)) LinkActivity.openInBrowser(this, text)
+    else startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(text)))
 } catch (_: Exception) { Toast.makeText(this, text, Toast.LENGTH_SHORT).show() }

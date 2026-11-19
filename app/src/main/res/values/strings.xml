@@ -48,7 +48,7 @@
     <string name="open">Open</string>
     <string name="copied">Copied</string>
     <string name="link_t">Link Cleaner</string>
-    <string name="link_d">Share a link to Sahl Tools (or paste one) — it opens short links, removes tracking codes and checks the link for malware and phishing.</string>
+    <string name="link_d">Paste links, share them here, or tap any link and choose Sahl Tools — it opens short links, removes tracking codes and checks the link for malware and phishing.</string>
     <string name="paste_link">Paste link</string>
     <string name="no_link">No link found. Copy a link first, or share one to Sahl Tools.</string>
     <string name="working">Working…</string>
@@ -100,4 +100,28 @@
     <string name="vt_key_how">Free: sign up at virustotal.com, open your profile → \"API key\", copy it and paste it here. Saved only on this phone.</string>
     <string name="save_key">Save</string>
     <string name="get_key">Get a free key</string>
+    <string name="paste_hint">Paste one or more links here…</string>
+    <string name="check">Check</string>
+    <string name="clear">Clear</string>
+    <string name="was_short">Short link opened to the real address</string>
+    <string name="tracking_removed">Tracking codes removed</string>
+    <string name="already_clean">No tracking codes found</string>
+    <string name="pick_browser">Open links with</string>
+    <string name="need_camera">Sahl Tools needs the camera to scan. Allow it, then try again.</string>
+    <string name="scan_failed">The scanner could not start.</string>
+    <string name="check_link">Check link</string>
+    <string name="nothing_hidden">No hidden details found — a clean copy was saved anyway</string>
+    <string name="share_clean">Share clean photos</string>
+    <string name="ex_location">Location: %1$s</string>
+    <string name="ex_camera">Phone/camera: %1$s</string>
+    <string name="ex_lens">Lens: %1$s</string>
+    <string name="ex_date">Date taken: %1$s</string>
+    <string name="ex_settings">Camera settings: %1$s</string>
+    <string name="ex_software">Software: %1$s</string>
+    <string name="ex_owner">Owner/author: %1$s</string>
+    <string name="ex_id">Unique photo ID</string>
+    <string name="ex_total">%1$d hidden details removed in total</string>
+    <string name="crash_t">Something went wrong last time</string>
+    <string name="crash_copy">Copy details</string>
+    <string name="crash_dismiss">Dismiss</string>
 </resources>

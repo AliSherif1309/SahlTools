@@ -58,6 +58,16 @@ class MainActivity : Activity() {
             setPadding(dp(14), dp(10), dp(14), dp(10)); gravity = Gravity.CENTER
         }
         list.addView(updateBar, LinearLayout.LayoutParams(-1, -2).apply { bottomMargin = dp(12) })
+        Tools.prefs(this).getString("crash", null)?.let { report ->
+            val c = card()
+            c.addView(text(getString(R.string.crash_t), 16f, R.color.text, true))
+            c.addView(text(report.lineSequence().take(4).joinToString("\n"), 12f, R.color.sub))
+            val r = LinearLayout(this)
+            r.addView(button(getString(R.string.crash_copy)) { copy(report) })
+            r.addView(button(getString(R.string.crash_dismiss)) { Tools.prefs(this).edit().remove("crash").apply(); c.visibility = View.GONE })
+            c.addView(r)
+            list.addView(c, LinearLayout.LayoutParams(-1, -2).apply { bottomMargin = dp(12) })
+        }
 
         for (k in Tools.ALL) list.addView(card(k), LinearLayout.LayoutParams(-1, -2).apply { bottomMargin = dp(12) })
 
@@ -190,11 +200,7 @@ class MainActivity : Activity() {
             R.string.open to { startActivity(Intent(this, ScanActivity::class.java)) },
             R.string.add_tile to { addTile(ScanTile::class.java, R.string.scan_t, R.drawable.ic_scan) })
         add(R.string.link_t, R.string.link_d, R.drawable.ic_link,
-            R.string.paste_link to {
-                val clip = getSystemService(android.content.ClipboardManager::class.java).primaryClip
-                val t = clip?.takeIf { it.itemCount > 0 }?.getItemAt(0)?.coerceToText(this)?.toString() ?: ""
-                startActivity(Intent(this, LinkActivity::class.java).putExtra(Intent.EXTRA_TEXT, t))
-            })
+            R.string.open to { startActivity(Intent(this, LinkActivity::class.java)) })
         add(R.string.photo_t, R.string.photo_d, R.drawable.ic_photo,
             R.string.pick_photos to { startActivity(Intent(this, PickPhotosActivity::class.java)) })
         add(R.string.save_t, R.string.save_d, R.drawable.ic_save)
