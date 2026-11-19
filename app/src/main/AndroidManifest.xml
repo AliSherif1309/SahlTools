@@ -136,6 +136,19 @@
         <provider android:name="rikka.shizuku.ShizukuProvider" android:authorities="${applicationId}.shizuku"
             android:multiprocess="false" android:enabled="true" android:exported="true"
             android:permission="android.permission.INTERACT_ACROSS_USERS_FULL" />
+        <activity android:name=".FreezerActivity" android:exported="false" android:label="@string/fr_t" />
+        <activity android:name=".AppPickerActivity" android:exported="false" android:label="@string/fr_add" />
+        <activity android:name=".DebloatActivity" android:exported="false" android:label="@string/db_t" />
+        <activity android:name=".FreezeLaunchActivity" android:exported="true" android:theme="@style/Invisible"
+            android:excludeFromRecents="true" android:taskAffinity="" />
+        <service android:name=".FreezeTile" android:exported="true" android:label="@string/fr_t" android:icon="@drawable/ic_freeze"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter><action android:name="android.service.quicksettings.action.QS_TILE" /></intent-filter>
+            <meta-data android:name="android.service.quicksettings.TOGGLEABLE_TILE" android:value="true" />
+        </service>
+        <service android:name=".AutoFreezeService" android:exported="false" android:foregroundServiceType="specialUse">
+            <property android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE" android:value="Refreezes apps the user chose after the screen turns off" />
+        </service>
         <receiver android:name=".InstallResult" android:exported="false" />
     </application>
 </manifest>

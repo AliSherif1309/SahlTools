@@ -97,13 +97,13 @@ object Tools {
     }
 
     /** Puts a service in the foreground with a small "is on — Stop" notification. */
-    fun foreground(s: Service, k: String, id: Int, actionLabel: Int = R.string.stop) {
+    fun foreground(s: Service, k: String, id: Int, actionLabel: Int = R.string.stop, title: String? = null, icon: Int? = null) {
         val nm = s.getSystemService(NotificationManager::class.java)
         nm.createNotificationChannel(NotificationChannel("tools", s.getString(R.string.channel), NotificationManager.IMPORTANCE_LOW))
         val stop = PendingIntent.getService(s, id, Intent(s, s.javaClass).setAction("stop"), PendingIntent.FLAG_IMMUTABLE)
         val open = PendingIntent.getActivity(s, 0, Intent(s, MainActivity::class.java), PendingIntent.FLAG_IMMUTABLE)
-        val n = Notification.Builder(s, "tools").setSmallIcon(icon(k))
-            .setContentTitle(s.getString(title(k)) + " " + s.getString(R.string.running))
+        val n = Notification.Builder(s, "tools").setSmallIcon(icon ?: icon(k))
+            .setContentTitle(title ?: (s.getString(title(k)) + " " + s.getString(R.string.running)))
             .setContentIntent(open).setOngoing(true)
             .addAction(Notification.Action.Builder(null, s.getString(actionLabel), stop).build())
             .build()
