@@ -42,9 +42,43 @@ object Focus {
     private fun save(c: Context, l: List<Session>) = p(c).edit().putString("focus_sessions",
         JSONArray(l.takeLast(3000).map { JSONObject().put("s", it.start).put("e", it.end).put("a", it.act) }).toString()).apply()
 
+    /** Optional session length in minutes (0 = open-ended). */
+    fun lengthMin(c: Context) = p(c).getInt("focus_len", 0)
+
     fun start(c: Context) {
-        if (running(c) == 0L) p(c).edit().putLong("focus_start", System.currentTimeMillis()).apply()
+        if (running(c) == 0L) p(c).edit().putLong("focus_start", System.currentTimeMillis()).putBoolean("focus_goal_told", minutesOn(c, 0) >= goalMin(c)).apply()
         notify(c)
+        schedule(c)
+    }
+
+    private fun alarmIntent(c: Context, kind: String) = PendingIntent.getBroadcast(c, if (kind == "len") 32 else 33,
+        Intent(c, FocusAlarm::class.java).putExtra("kind", kind), PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
+
+    /** Alarms for "session time is up" and "daily goal reached". */
+    fun schedule(c: Context) {
+        val am = c.getSystemService(android.app.AlarmManager::class.java)
+        val now = System.currentTimeMillis()
+        val r = running(c); if (r == 0L) return
+        val len = lengthMin(c)
+        if (len > 0) am.setAndAllowWhileIdle(android.app.AlarmManager.RTC_WAKEUP, r + len * 60_000L, alarmIntent(c, "len"))
+        val left = goalMin(c) - minutesOn(c, 0)
+        if (left > 0) am.setAndAllowWhileIdle(android.app.AlarmManager.RTC_WAKEUP, now + left * 60_000L, alarmIntent(c, "goal"))
+    }
+
+    fun cancelAlarms(c: Context) {
+        val am = c.getSystemService(android.app.AlarmManager::class.java)
+        am.cancel(alarmIntent(c, "len")); am.cancel(alarmIntent(c, "goal"))
+    }
+
+    /** Loud-enough alert (sound + vibration) shown as its own notification. */
+    fun alert(c: Context, title: String, text: String) {
+        val nm = c.getSystemService(NotificationManager::class.java)
+        nm.createNotificationChannel(NotificationChannel("focus_alert", c.getString(R.string.fo_alerts), NotificationManager.IMPORTANCE_HIGH).apply {
+            enableVibration(true); vibrationPattern = longArrayOf(0, 400, 200, 400)
+        })
+        val open = PendingIntent.getActivity(c, 34, Intent(c, FocusActivity::class.java), PendingIntent.FLAG_IMMUTABLE)
+        nm.notify(35, Notification.Builder(c, "focus_alert").setSmallIcon(R.drawable.ic_focus)
+            .setContentTitle(title).setContentText(text).setContentIntent(open).setAutoCancel(true).build())
     }
 
     /** Stops and saves the session (sessions under 1 minute are dropped). */
@@ -54,6 +88,7 @@ object Focus {
         if (keep && now - s >= 60_000) save(c, sessions(c) + Session(s, now, activity(c)))
         p(c).edit().putLong("focus_start", 0L).apply()
         c.getSystemService(NotificationManager::class.java).cancel(31)
+        cancelAlarms(c)
     }
 
     fun delete(c: Context, s: Session) = save(c, sessions(c).filterNot { it.start == s.start })
@@ -100,6 +135,23 @@ object Focus {
     }
 }
 
+/** Fires when the chosen session length is over, or when today's goal is reached. */
+class FocusAlarm : android.content.BroadcastReceiver() {
+    override fun onReceive(c: Context, i: Intent) {
+        if (Focus.running(c) == 0L) return
+        when (i.getStringExtra("kind")) {
+            "len" -> {
+                Focus.alert(c, c.getString(R.string.fo_len_done_t), c.getString(R.string.fo_len_done, Focus.hm(Focus.lengthMin(c).toLong()), Focus.activity(c)))
+                if (Tools.prefs(c).getBoolean("focus_autostop", false)) Focus.stop(c)
+            }
+            "goal" -> if (!Tools.prefs(c).getBoolean("focus_goal_told", false) && Focus.minutesOn(c, 0) >= Focus.goalMin(c)) {
+                Tools.prefs(c).edit().putBoolean("focus_goal_told", true).apply()
+                Focus.alert(c, c.getString(R.string.fo_goal_alert_t), c.getString(R.string.fo_goal_done, Focus.hm(Focus.minutesOn(c, 0))))
+            } else Focus.schedule(c)
+        }
+    }
+}
+
 class FocusActivity : Activity() {
     private val h = Handler(Looper.getMainLooper())
     private lateinit var col: LinearLayout
@@ -138,6 +190,21 @@ class FocusActivity : Activity() {
             }
             addView(big, LinearLayout.LayoutParams(-1, -2))
             if (running) addView(sahlButton(getString(R.string.fo_discard)) { Focus.stop(this@FocusActivity, keep = false); draw() })
+            val len = Focus.lengthMin(this@FocusActivity)
+            addView(sahlButton("⏰  " + if (len == 0) getString(R.string.fo_len_none) else getString(R.string.fo_len, Focus.hm(len.toLong()))) {
+                val next = when (len) { 0 -> 25; 25 -> 45; 45 -> 60; 60 -> 90; 90 -> 120; else -> 0 }
+                Tools.prefs(this@FocusActivity).edit().putInt("focus_len", next).apply()
+                Focus.cancelAlarms(this@FocusActivity); Focus.schedule(this@FocusActivity); draw()
+            })
+            if (len > 0) addView(android.widget.Switch(this@FocusActivity).apply {
+                text = getString(R.string.fo_autostop); typeface = sahlFont(); setTextColor(getColor(R.color.text))
+                isChecked = Tools.prefs(this@FocusActivity).getBoolean("focus_autostop", false)
+                setOnCheckedChangeListener { _, on -> Tools.prefs(this@FocusActivity).edit().putBoolean("focus_autostop", on).apply() }
+            })
+            if (running && len > 0) {
+                val left = Focus.running(this@FocusActivity) + len * 60_000L - System.currentTimeMillis()
+                addView(label(if (left > 0) getString(R.string.fo_len_left, Focus.fmt(left)) else getString(R.string.fo_len_done_t), 13f, R.color.emerald, true).apply { gravity = Gravity.CENTER })
+            }
             addView(label(getString(R.string.fo_hint), 12f, R.color.sub).apply { gravity = Gravity.CENTER; setPadding(0, dp(6), 0, 0) })
         })
 
@@ -191,7 +258,8 @@ class FocusActivity : Activity() {
             addView(label("🔥 " + getString(R.string.fo_streak, Focus.streak(this@FocusActivity)), 15f))
             addView(sahlButton(getString(R.string.fo_change_goal, Focus.hm(goal.toLong()))) {
                 val next = when (goal) { 30 -> 60; 60 -> 90; 90 -> 120; 120 -> 180; 180 -> 240; 240 -> 300; 300 -> 360; 360 -> 480; else -> 30 }
-                Tools.prefs(this@FocusActivity).edit().putInt("focus_goal", next).apply(); draw()
+                Tools.prefs(this@FocusActivity).edit().putInt("focus_goal", next).putBoolean("focus_goal_told", Focus.minutesOn(this@FocusActivity, 0) >= next).apply()
+                Focus.cancelAlarms(this@FocusActivity); Focus.schedule(this@FocusActivity); draw()
             })
             addView(android.widget.Switch(this@FocusActivity).apply {
                 text = getString(R.string.fo_awake); typeface = sahlFont(); setTextColor(getColor(R.color.text))

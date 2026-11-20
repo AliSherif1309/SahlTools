@@ -375,4 +375,12 @@
     <string name="fo_week_total">هذا الأسبوع: %1$s · بمعدل %2$s يوميًا</string>
     <string name="fo_by_act">حسب النشاط (آخر ٣٠ يومًا)</string>
     <string name="fo_recent">الجلسات الأخيرة</string>
+    <string name="fo_alerts">تنبيهات التركيز</string>
+    <string name="fo_len_none">مدة الجلسة: مفتوحة (اضغط لضبط مؤقت)</string>
+    <string name="fo_len">مدة الجلسة: %1$s (اضغط للتغيير)</string>
+    <string name="fo_autostop">إيقاف وحفظ تلقائيًا عند انتهاء الوقت</string>
+    <string name="fo_len_left">الوقت المتبقي: %1$s</string>
+    <string name="fo_len_done_t">⏰ انتهى وقت الجلسة</string>
+    <string name="fo_len_done">ركّزت %1$s على %2$s. خذ استراحة أو تابع.</string>
+    <string name="fo_goal_alert_t">🎉 تحقق الهدف اليومي</string>
 </resources>

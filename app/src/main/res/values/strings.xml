@@ -375,4 +375,12 @@ Password: %2$s</string>
     <string name="fo_week_total">This week: %1$s · average %2$s a day</string>
     <string name="fo_by_act">By activity (last 30 days)</string>
     <string name="fo_recent">Recent sessions</string>
+    <string name="fo_alerts">Focus alerts</string>
+    <string name="fo_len_none">Session length: open-ended (tap to set a timer)</string>
+    <string name="fo_len">Session length: %1$s (tap to change)</string>
+    <string name="fo_autostop">Stop and save automatically when the time is up</string>
+    <string name="fo_len_left">Time left: %1$s</string>
+    <string name="fo_len_done_t">⏰ Session time is up</string>
+    <string name="fo_len_done">You focused %1$s on %2$s. Take a break or keep going.</string>
+    <string name="fo_goal_alert_t">🎉 Daily goal reached</string>
 </resources>
