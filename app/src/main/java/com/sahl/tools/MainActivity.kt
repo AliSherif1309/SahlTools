@@ -87,6 +87,7 @@ class MainActivity : Activity() {
 
         if (Build.VERSION.SDK_INT >= 33) requestPermissions(arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), 1)
         checkUpdate()
+        Updater.scheduleDaily(this)
     }
 
     private fun card(k: String): View {
@@ -263,26 +264,33 @@ class MainActivity : Activity() {
         super.onPause()
     }
 
-    /** Checks GitHub for a newer version; the gold bar downloads and installs it inside the app. */
-    private fun checkUpdate(manual: Boolean = false) = Thread {
-        val r = Updater.fetchNewer()
-        runOnUiThread {
-            if (r == null) {
-                if (manual) Toast.makeText(this, R.string.up_to_date, Toast.LENGTH_SHORT).show()
-                return@runOnUiThread
+    /** Checks GitHub for a newer version (Sahl Adhan way): gold card with notes, "Update now" downloads in the browser. */
+    private fun checkUpdate(manual: Boolean = false) {
+        if (manual) { updateBar.text = Updater.checkingText(this); updateBar.visibility = View.VISIBLE; updateBar.setOnClickListener(null) }
+        Thread {
+            val r = Updater.fetchNewer()
+            runOnUiThread {
+                if (r == null) {
+                    if (manual) {
+                        updateBar.text = Updater.upToDateText(this)
+                        Toast.makeText(this, Updater.upToDateText(this), Toast.LENGTH_LONG).show()
+                    } else updateBar.visibility = View.GONE
+                    return@runOnUiThread
+                }
+                val notes = if (r.notes.isNotBlank()) "\n" + r.notes else ""
+                updateBar.text = Updater.availableText(this, r) + notes + "\n\n⬇  " + Updater.updateNowText(this)
+                updateBar.visibility = View.VISIBLE
+                updateBar.setOnClickListener {
+                    Updater.downloadAndInstall(this, r)
+                    Toast.makeText(this, Updater.downloadingText(this), Toast.LENGTH_LONG).show()
+                }
+                if (manual) {
+                    Toast.makeText(this, Updater.availableText(this, r), Toast.LENGTH_LONG).show()
+                    (updateBar.parent?.parent as? ScrollView)?.smoothScrollTo(0, 0)
+                }
             }
-            updateBar.text = getString(R.string.update_available, r.tag)
-            updateBar.visibility = View.VISIBLE
-            updateBar.setOnClickListener {
-                if (!Updater.canInstall(this)) return@setOnClickListener
-                updateBar.isEnabled = false
-                Thread {
-                    try {
-                        Updater.install(this, r) { pct -> runOnUiThread { updateBar.text = getString(R.string.downloading, pct) } }
-                    } catch (e: Exception) {
-                        runOnUiThread { updateBar.isEnabled = true; updateBar.text = getString(R.string.update_failed) }
-                    }
-                }.start()
+        }.start()
+    }
             }
         }
     }.start()
