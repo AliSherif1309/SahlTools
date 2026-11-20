@@ -415,8 +415,8 @@
     <string name="pr_m_i">كلمة I تُكتب دائمًا بحرف كبير</string>
     <string name="pr_m_have">الصحيح have (could have)</string>
     <string name="pr_m_than">استخدم than للمقارنة</string>
-    <string name="pr_m_youre">هل تقصد you're (you are)؟</string>
-    <string name="pr_m_its">هل تقصد it's (it is)؟</string>
+    <string name="pr_m_youre">هل تقصد you\'re (you are)؟</string>
+    <string name="pr_m_its">هل تقصد it\'s (it is)؟</string>
     <string name="pr_m_cap">ابدأ الجملة بحرف كبير</string>
     <string name="pr_m_space">مسافة مزدوجة</string>
 </resources>
