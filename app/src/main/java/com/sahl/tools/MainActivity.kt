@@ -291,7 +291,4 @@ class MainActivity : Activity() {
             }
         }.start()
     }
-            }
-        }
-    }.start()
 }
