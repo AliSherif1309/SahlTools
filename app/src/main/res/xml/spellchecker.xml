@@ -1,0 +1,6 @@
+<spell-checker xmlns:android="http://schemas.android.com/apk/res/android"
+    android:label="@string/pr_t" android:settingsActivity="com.sahl.tools.ProofActivity">
+    <subtype android:label="@string/pr_english" android:subtypeLocale="en" />
+    <subtype android:label="@string/pr_english" android:subtypeLocale="en_US" />
+    <subtype android:label="@string/pr_english" android:subtypeLocale="en_GB" />
+</spell-checker>

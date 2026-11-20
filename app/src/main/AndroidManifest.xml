@@ -167,5 +167,19 @@
         <receiver android:name=".UpdateCheckReceiver" android:exported="false" />
         <activity android:name=".FocusActivity" android:exported="false" android:label="@string/fo_t" android:launchMode="singleTop" />
         <receiver android:name=".FocusAlarm" android:exported="false" />
+        <service android:name=".SahlSpellChecker" android:exported="true" android:label="@string/pr_t"
+            android:permission="android.permission.BIND_TEXT_SERVICE">
+            <intent-filter><action android:name="android.service.textservice.SpellCheckerService" /></intent-filter>
+            <meta-data android:name="android.view.textservice.scs" android:resource="@xml/spellchecker" />
+        </service>
+        <activity android:name=".ProofActivity" android:exported="true" android:label="@string/pr_t" />
+        <activity android:name=".ProofPopupActivity" android:exported="true" android:label="@string/pr_action"
+            android:theme="@style/Popup" android:excludeFromRecents="true" android:taskAffinity="">
+            <intent-filter>
+                <action android:name="android.intent.action.PROCESS_TEXT" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
+            </intent-filter>
+        </activity>
     </application>
 </manifest>

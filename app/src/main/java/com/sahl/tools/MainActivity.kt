@@ -305,6 +305,9 @@ class MainActivity : Activity() {
         add(R.string.photo_t, R.string.photo_d, R.drawable.ic_photo,
             R.string.pick_photos to { startActivity(Intent(this, PickPhotosActivity::class.java)) })
         add(R.string.save_t, R.string.save_d, R.drawable.ic_save)
+        current = section(col, "✍  " + getString(R.string.sec_writing))
+        add(R.string.pr_t, R.string.pr_d, R.drawable.ic_proof,
+            R.string.open to { startActivity(Intent(this, ProofActivity::class.java)) })
         current = section(col, "🎯  " + getString(R.string.sec_focus))
         add(R.string.fo_t, R.string.fo_d, R.drawable.ic_focus,
             R.string.open to { startActivity(Intent(this, FocusActivity::class.java)) })

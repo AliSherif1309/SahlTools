@@ -17,6 +17,12 @@ jobs:
           if [ -z "$KEYSTORE_B64" ]; then echo "::error::Add the KEYSTORE_B64 and KEYSTORE_PASS secrets first"; exit 1; fi
           echo "$KEYSTORE_B64" | base64 -d > $RUNNER_TEMP/release.keystore
           echo "KEYSTORE_FILE=$RUNNER_TEMP/release.keystore" >> $GITHUB_ENV
+      # English word list ranked by how common each word is (FrequencyWords, CC BY-SA 4.0) for the proofreader
+      - name: Download word list
+        run: |
+          mkdir -p app/src/main/assets
+          curl -fSL --retry 3 https://raw.githubusercontent.com/hermitdave/FrequencyWords/master/content/2018/en/en_50k.txt -o app/src/main/assets/en_words.txt
+          wc -l app/src/main/assets/en_words.txt
       - uses: actions/setup-java@v4
         with:
           distribution: temurin

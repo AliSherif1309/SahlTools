@@ -383,4 +383,40 @@
     <string name="fo_len_done_t">⏰ انتهى وقت الجلسة</string>
     <string name="fo_len_done">ركّزت %1$s على %2$s. خذ استراحة أو تابع.</string>
     <string name="fo_goal_alert_t">🎉 تحقق الهدف اليومي</string>
+    <string name="sec_writing">الكتابة</string>
+    <string name="pr_t">المدقق اللغوي</string>
+    <string name="pr_english">الإنجليزية</string>
+    <string name="pr_action">تدقيق</string>
+    <string name="pr_d">يفحص الإملاء والقواعد أثناء الكتابة في أي تطبيق — تُوضع خطوط تحت الأخطاء؛ اضغط على الخطأ لتصحيحه. يعمل دون إنترنت وبخصوصية.</string>
+    <string name="pr_on">المدقق اللغوي يعمل على الهاتف كله</string>
+    <string name="pr_off">المدقق اللغوي متوقف</string>
+    <string name="pr_how">اكتب في أي تطبيق: الخط الأحمر = إملاء، الأزرق = قواعد. اضغط على الكلمة لاختيار التصحيح. للإنجليزية فقط — النص العربي لا يتأثر.</string>
+    <string name="pr_enable_shizuku">تشغيل بضغطة واحدة (Shizuku)</string>
+    <string name="pr_enable_manual">فتح إعدادات المدقق الإملائي</string>
+    <string name="pr_manual_steps">يدويًا: الإعدادات ← النظام ← اللغات والإدخال ← المدقق الإملائي ← شغّله واختر \"المدقق اللغوي (سهل للأدوات)\".</string>
+    <string name="pr_enabled">تم تشغيل المدقق اللغوي</string>
+    <string name="pr_online">فحص قواعد عميق عبر الإنترنت (LanguageTool)</string>
+    <string name="pr_online_note">متوقف = كل شيء يبقى على هاتفك (الإملاء + قواعد شائعة). مفعّل = تُرسل الجمل إلى LanguageTool لفحص أعمق بكثير. أوقفه للرسائل الخاصة.</string>
+    <string name="pr_select_tip">نصيحة: حدّد أي نص ثم اضغط \"تدقيق\" من القائمة (⋮) لفحصه وتصحيحه دفعة واحدة.</string>
+    <string name="pr_try">جرّبه</string>
+    <string name="pr_try_hint">اكتب أو الصق نصًا لفحصه…</string>
+    <string name="pr_clean">لا توجد أخطاء</string>
+    <string name="pr_found">%1$d ملاحظات — %2$d إملاء، %3$d قواعد</string>
+    <string name="pr_fix_all">تصحيح الكل</string>
+    <string name="pr_add_word">أضف \"%1$s\" إلى كلماتي</string>
+    <string name="pr_replace">استبدال النص</string>
+    <string name="pr_dict">كلماتي (%1$d)</string>
+    <string name="pr_dict_hint">كلمة ليست خطأً (أسماء، مصطلحات)…</string>
+    <string name="pr_m_spell">خطأ إملائي محتمل</string>
+    <string name="pr_m_typo">خطأ كتابي شائع</string>
+    <string name="pr_m_repeat">الكلمة مكررة مرتين</string>
+    <string name="pr_m_an">استخدم an قبل صوت متحرك</string>
+    <string name="pr_m_a">استخدم a قبل صوت ساكن</string>
+    <string name="pr_m_i">كلمة I تُكتب دائمًا بحرف كبير</string>
+    <string name="pr_m_have">الصحيح have (could have)</string>
+    <string name="pr_m_than">استخدم than للمقارنة</string>
+    <string name="pr_m_youre">هل تقصد you're (you are)؟</string>
+    <string name="pr_m_its">هل تقصد it's (it is)؟</string>
+    <string name="pr_m_cap">ابدأ الجملة بحرف كبير</string>
+    <string name="pr_m_space">مسافة مزدوجة</string>
 </resources>

@@ -383,4 +383,40 @@ Password: %2$s</string>
     <string name="fo_len_done_t">⏰ Session time is up</string>
     <string name="fo_len_done">You focused %1$s on %2$s. Take a break or keep going.</string>
     <string name="fo_goal_alert_t">🎉 Daily goal reached</string>
+    <string name="sec_writing">Writing</string>
+    <string name="pr_t">Proofreader</string>
+    <string name="pr_english">English</string>
+    <string name="pr_action">Proofread</string>
+    <string name="pr_d">Checks spelling and grammar as you type in any app — mistakes are underlined; tap one to fix it. Works offline and privately.</string>
+    <string name="pr_on">Proofreader is on for the whole phone</string>
+    <string name="pr_off">Proofreader is OFF</string>
+    <string name="pr_how">Type in any app: red underline = spelling, blue = grammar. Tap the underlined word to pick a fix. English only — Arabic text is left alone.</string>
+    <string name="pr_enable_shizuku">Turn on with one tap (Shizuku)</string>
+    <string name="pr_enable_manual">Open spell checker settings</string>
+    <string name="pr_manual_steps">Manually: Settings → System → Languages &amp; input → Spell checker → turn it on and choose \"Proofreader (Sahl Tools)\".</string>
+    <string name="pr_enabled">Proofreader turned on</string>
+    <string name="pr_online">Deep grammar check online (LanguageTool)</string>
+    <string name="pr_online_note">Off = everything stays on your phone (spelling + common grammar rules). On = sentences are sent to LanguageTool for a much deeper check. Turn it off for private messages.</string>
+    <string name="pr_select_tip">Tip: select any text, then tap \"Proofread\" in the menu (⋮) to check and fix it in one go.</string>
+    <string name="pr_try">Try it</string>
+    <string name="pr_try_hint">Type or paste text to check…</string>
+    <string name="pr_clean">No problems found</string>
+    <string name="pr_found">%1$d issues — %2$d spelling, %3$d grammar</string>
+    <string name="pr_fix_all">Fix all</string>
+    <string name="pr_add_word">Add \"%1$s\" to my words</string>
+    <string name="pr_replace">Replace text</string>
+    <string name="pr_dict">My words (%1$d)</string>
+    <string name="pr_dict_hint">A word that is not a mistake (names, terms)…</string>
+    <string name="pr_m_spell">Possible spelling mistake</string>
+    <string name="pr_m_typo">Common typo</string>
+    <string name="pr_m_repeat">The same word twice</string>
+    <string name="pr_m_an">Use \"an\" before a vowel sound</string>
+    <string name="pr_m_a">Use \"a\" before a consonant sound</string>
+    <string name="pr_m_i">The word \"I\" is always a capital</string>
+    <string name="pr_m_have">Should be \"have\" (could have, should have)</string>
+    <string name="pr_m_than">Use \"than\" for comparisons</string>
+    <string name="pr_m_youre">Did you mean \"you\'re\" (you are)?</string>
+    <string name="pr_m_its">Did you mean \"it\'s\" (it is)?</string>
+    <string name="pr_m_cap">Start the sentence with a capital letter</string>
+    <string name="pr_m_space">Double space</string>
 </resources>
