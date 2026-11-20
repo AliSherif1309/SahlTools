@@ -252,6 +252,7 @@ fun Activity.shizukuGate(col: LinearLayout, explain: Int): Boolean {
 // ───────────────────────── Freezer screen ─────────────────────────
 class FreezerActivity : Activity() {
     private lateinit var col: LinearLayout
+    private var query = ""
     private val listener = Shizuku.OnRequestPermissionResultListener { _, r -> runOnUiThread { if (r == PackageManager.PERMISSION_GRANTED) draw() } }
 
     override fun onCreate(b: Bundle?) {
@@ -321,7 +322,24 @@ class FreezerActivity : Activity() {
         })
 
         if (list.isEmpty()) { col.addView(label(getString(R.string.fr_empty), 15f, R.color.sub)); return }
-        for (pkg in list.sortedBy { appName(it).lowercase() }) col.addSpaced(appCard(pkg))
+        val holder = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
+        val cards = list.sortedBy { appName(it).lowercase() }.map { pkg -> (appName(pkg) + " " + pkg).lowercase() to appCard(pkg) }
+        col.addView(EditText(this).apply {
+            hint = "🔍  " + getString(R.string.fr_search); typeface = sahlFont(); setSingleLine(); setText(query)
+            addTextChangedListener(object : TextWatcher {
+                override fun afterTextChanged(e: Editable?) {
+                    query = e.toString().lowercase()
+                    for ((t, v) in cards) v.visibility = if (query.isBlank() || t.contains(query)) View.VISIBLE else View.GONE
+                }
+                override fun beforeTextChanged(a: CharSequence?, b: Int, c: Int, d: Int) {}
+                override fun onTextChanged(a: CharSequence?, b: Int, c: Int, d: Int) {}
+            })
+        }, LinearLayout.LayoutParams(-1, -2))
+        for ((t, v) in cards) {
+            holder.addSpaced(v)
+            if (query.isNotBlank() && !t.contains(query)) v.visibility = View.GONE
+        }
+        col.addView(holder)
     }
 
     private fun appName(pkg: String) = try {

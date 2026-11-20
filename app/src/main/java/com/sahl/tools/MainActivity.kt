@@ -28,6 +28,35 @@ import android.widget.Toast
 class MainActivity : Activity() {
     private val switches = HashMap<String, Switch>()
     private var soundBtn: Button? = null
+    private val sections = ArrayList<Pair<View, MutableList<Pair<View, String>>>>()
+    private lateinit var scroller: ScrollView
+    private lateinit var noMatch: TextView
+
+    /** A section title; returns the list its tool cards register in (for search). */
+    private fun section(parent: LinearLayout, title: String): MutableList<Pair<View, String>> {
+        val h = text(title, 20f, R.color.emerald, true).apply { setPadding(dp(4), dp(14), 0, dp(8)) }
+        parent.addView(h)
+        val l = ArrayList<Pair<View, String>>()
+        sections.add(h to l)
+        return l
+    }
+
+    /** Shows only the tools whose name or description contains the search words. */
+    private fun filter(q: String) {
+        val words = q.lowercase().split(' ').filter { it.isNotBlank() }
+        var any = false
+        for ((h, cards) in sections) {
+            var vis = false
+            for ((v, t) in cards) {
+                val ok = words.all { t.contains(it) }
+                v.visibility = if (ok) View.VISIBLE else View.GONE
+                if (ok) vis = true
+            }
+            h.visibility = if (vis) View.VISIBLE else View.GONE
+            if (vis) any = true
+        }
+        noMatch.visibility = if (any) View.GONE else View.VISIBLE
+    }
     private var linkOffBar: TextView? = null
     private lateinit var font: Typeface
     private lateinit var updateBar: TextView
@@ -76,14 +105,38 @@ class MainActivity : Activity() {
             list.addView(c, LinearLayout.LayoutParams(-1, -2).apply { bottomMargin = dp(12) })
         }
 
-        for (k in Tools.ALL) list.addView(card(k), LinearLayout.LayoutParams(-1, -2).apply { bottomMargin = dp(12) })
+        // Search + category shortcuts
+        val search = android.widget.EditText(this).apply {
+            hint = "🔍  " + getString(R.string.search_tools); typeface = font; setSingleLine(); textSize = 16f
+            addTextChangedListener(object : android.text.TextWatcher {
+                override fun afterTextChanged(e: android.text.Editable?) = filter(e.toString())
+                override fun beforeTextChanged(a: CharSequence?, b: Int, c: Int, d: Int) {}
+                override fun onTextChanged(a: CharSequence?, b: Int, c: Int, d: Int) {}
+            })
+        }
+        list.addView(search, LinearLayout.LayoutParams(-1, -2))
+        val chips = LinearLayout(this)
+        list.addView(android.widget.HorizontalScrollView(this).apply { isHorizontalScrollBarEnabled = false; addView(chips) },
+            LinearLayout.LayoutParams(-1, -2).apply { bottomMargin = dp(6) })
+        noMatch = text(getString(R.string.search_none), 15f, R.color.sub).apply { visibility = View.GONE; setPadding(dp(4), dp(12), 0, dp(12)) }
+        list.addView(noMatch)
 
-        list.addView(text(getString(R.string.share_tools), 20f, R.color.emerald, true).apply { setPadding(dp(4), dp(12), 0, dp(8)) })
-        list.addView(utilityCards(), LinearLayout.LayoutParams(-1, -2))
+        val quick = section(list, "⚡  " + getString(R.string.sec_quick))
+        for (k in Tools.ALL) {
+            val v = card(k)
+            list.addView(v, LinearLayout.LayoutParams(-1, -2).apply { bottomMargin = dp(12) })
+            quick.add(v to (getString(Tools.title(k)) + " " + getString(Tools.desc(k))).lowercase())
+        }
+        utilityCards(list)
+        for ((header, _) in sections) chips.addView(text((header as TextView).text, 14f, R.color.card, true).apply {
+            setPadding(dp(14), dp(8), dp(14), dp(8)); background = rounded(R.color.emerald, 18)
+            setOnClickListener { search.setText(""); scroller.post { scroller.smoothScrollTo(0, header.top) } }
+        }, LinearLayout.LayoutParams(-2, -2).apply { marginEnd = dp(8); topMargin = dp(6) })
 
         list.addView(button(getString(R.string.check_updates) + "  ·  v" + BuildConfig.VERSION_NAME) { checkUpdate(true) })
         list.addView(text(getString(R.string.battery_hint), 13f, R.color.sub).apply { setPadding(dp(4), dp(8), dp(4), 0) })
-        setContentView(ScrollView(this).apply { addView(list) })
+        scroller = ScrollView(this).apply { addView(list) }
+        setContentView(scroller)
 
         if (Build.VERSION.SDK_INT >= 33) requestPermissions(arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), 1)
         checkUpdate()
@@ -203,8 +256,8 @@ class MainActivity : Activity() {
     }
 
     /** Scan & share tools: each opens its own screen, or works from Android's Share menu. */
-    private fun utilityCards(): LinearLayout {
-        val col = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
+    private fun utilityCards(col: LinearLayout) {
+        var current = ArrayList<Pair<View, String>>() as MutableList<Pair<View, String>>
         fun add(title: Int, desc: Int, icon: Int, vararg actions: Pair<Int, () -> Unit>) {
             val c = card()
             val top = LinearLayout(this).apply { gravity = Gravity.CENTER_VERTICAL }
@@ -216,40 +269,47 @@ class MainActivity : Activity() {
             c.addView(text(getString(desc), 14f, R.color.sub).apply { setPadding(0, dp(8), 0, dp(4)) })
             c.addView(actions(*actions.map { (label, act) -> button(getString(label)) { act() } }.toTypedArray()))
             col.addSpaced(c)
+            current.add(c to (getString(title) + " " + getString(desc)).lowercase())
         }
-        add(R.string.scan_t, R.string.scan_d, R.drawable.ic_scan,
-            R.string.open to { startActivity(Intent(this, ScanActivity::class.java)) },
-            R.string.add_tile to { addTile(ScanTile::class.java, R.string.scan_t, R.drawable.ic_scan) })
+        current = section(col, "🔗  " + getString(R.string.sec_links))
         add(R.string.link_t, R.string.link_d, R.drawable.ic_link,
             R.string.open to { startActivity(Intent(this, LinkActivity::class.java)) },
             R.string.check_all_links to { askBrowserRole() },
             R.string.vt_key_title to { LinkSafety.askKey(this) {} },
             R.string.change_opener to { LinkActivity.forgetBrowser(this); Toast.makeText(this, R.string.opener_reset, Toast.LENGTH_SHORT).show() })
-        add(R.string.photo_t, R.string.photo_d, R.drawable.ic_photo,
-            R.string.pick_photos to { startActivity(Intent(this, PickPhotosActivity::class.java)) })
-        add(R.string.save_t, R.string.save_d, R.drawable.ic_save)
-        add(R.string.wifi_t, R.string.wifi_d, R.drawable.ic_wifi,
-            R.string.open to { startActivity(Intent(this, WifiActivity::class.java)) })
+        add(R.string.scan_t, R.string.scan_d, R.drawable.ic_scan,
+            R.string.open to { startActivity(Intent(this, ScanActivity::class.java)) },
+            R.string.add_tile to { addTile(ScanTile::class.java, R.string.scan_t, R.drawable.ic_scan) })
         add(R.string.cg_t, R.string.cg_d, R.drawable.ic_shield,
             R.string.open to { startActivity(Intent(this, CallGuardActivity::class.java)) })
+        current = section(col, "📱  " + getString(R.string.sec_apps))
         add(R.string.fr_t, R.string.fr_d, R.drawable.ic_freeze,
             R.string.open to { startActivity(Intent(this, FreezerActivity::class.java)) },
             R.string.add_tile to { addTile(FreezeTile::class.java, R.string.fr_t, R.drawable.ic_freeze) })
         add(R.string.db_t, R.string.db_d, R.drawable.ic_debloat,
             R.string.open to { startActivity(Intent(this, DebloatActivity::class.java)) })
-        add(R.string.wpass_t, R.string.wpass_d, R.drawable.ic_wifi,
-            R.string.open to { startActivity(Intent(this, WifiPassActivity::class.java)) })
+        add(R.string.launcher_t, R.string.launcher_d, R.drawable.ic_apps,
+            R.string.open to { startActivity(Intent(this, LauncherActivity::class.java)) })
         add(R.string.deeplink_t, R.string.deeplink_d, R.drawable.ic_link,
             R.string.open to { startActivity(Intent(this, DeepLinkActivity::class.java)) })
+        current = section(col, "📶  " + getString(R.string.sec_net))
+        add(R.string.wifi_t, R.string.wifi_d, R.drawable.ic_wifi,
+            R.string.open to { startActivity(Intent(this, WifiActivity::class.java)) })
+        add(R.string.wpass_t, R.string.wpass_d, R.drawable.ic_wifi,
+            R.string.open to { startActivity(Intent(this, WifiPassActivity::class.java)) })
         add(R.string.speed_t, R.string.speed_d, R.drawable.ic_speed,
             R.string.open to { startActivity(Intent(this, SpeedActivity::class.java)) })
         add(R.string.data_t, R.string.data_d, R.drawable.ic_data,
             R.string.open to { startActivity(Intent(this, DataActivity::class.java)) })
-        add(R.string.launcher_t, R.string.launcher_d, R.drawable.ic_apps,
-            R.string.open to { startActivity(Intent(this, LauncherActivity::class.java)) })
+        current = section(col, "🖼  " + getString(R.string.sec_files))
+        add(R.string.photo_t, R.string.photo_d, R.drawable.ic_photo,
+            R.string.pick_photos to { startActivity(Intent(this, PickPhotosActivity::class.java)) })
+        add(R.string.save_t, R.string.save_d, R.drawable.ic_save)
+        current = section(col, "🎯  " + getString(R.string.sec_focus))
+        add(R.string.fo_t, R.string.fo_d, R.drawable.ic_focus,
+            R.string.open to { startActivity(Intent(this, FocusActivity::class.java)) })
         add(R.string.light_t, R.string.light_d, R.drawable.ic_light,
             R.string.open to { startActivity(Intent(this, ScreenLightActivity::class.java)) })
-        return col
     }
 
     override fun onResume() {
