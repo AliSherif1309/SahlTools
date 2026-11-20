@@ -153,5 +153,7 @@
             <intent-filter><action android:name="android.telecom.CallScreeningService" /></intent-filter>
         </service>
         <receiver android:name=".UpdateCheckReceiver" android:exported="false" />
+        <activity android:name=".FocusActivity" android:exported="false" android:label="@string/fo_t" android:launchMode="singleTop" />
+        <receiver android:name=".FocusAlarm" android:exported="false" />
     </application>
 </manifest>
