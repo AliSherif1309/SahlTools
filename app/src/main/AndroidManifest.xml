@@ -1,5 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+    <!-- Sahl Union: shared with every Sahl app signed with the same key -->
+    <permission android:name="com.sahl.permission.UNION" android:label="Sahl apps" android:protectionLevel="signature" />
+    <uses-permission android:name="com.sahl.permission.UNION" />
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
@@ -148,7 +151,16 @@
         <service android:name=".AutoFreezeService" android:exported="false" android:foregroundServiceType="specialUse">
             <property android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE" android:value="Refreezes apps the user chose after the screen turns off" />
         </service>
-        <activity android:name=".CallGuardActivity" android:exported="false" android:label="@string/cg_t" />
+        <activity android:name=".CallGuardActivity" android:exported="true" android:label="@string/cg_t"
+            android:permission="com.sahl.permission.UNION">
+            <!-- Sahl Union: Sahl Phone opens Call Guard settings from here -->
+            <intent-filter>
+                <action android:name="com.sahl.tools.action.CALL_GUARD" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <provider android:name=".UnionProvider" android:authorities="com.sahl.tools.union" android:exported="true"
+            android:readPermission="com.sahl.permission.UNION" android:writePermission="com.sahl.permission.UNION" />
         <service android:name=".SahlCallScreening" android:exported="true" android:permission="android.permission.BIND_SCREENING_SERVICE">
             <intent-filter><action android:name="android.telecom.CallScreeningService" /></intent-filter>
         </service>
