@@ -3,6 +3,16 @@
     <!-- Sahl Union: shared with every Sahl app signed with the same key -->
     <permission android:name="com.sahl.permission.UNION" android:label="Sahl apps" android:protectionLevel="signature" />
     <uses-permission android:name="com.sahl.permission.UNION" />
+    <queries>
+        <provider android:authorities="com.sahl.contacts.union" />
+        <provider android:authorities="com.sahl.phone.union" />
+        <provider android:authorities="com.sahl.messages.union" />
+        <provider android:authorities="com.sahl.files.union" />
+        <package android:name="com.sahl.contacts" />
+        <package android:name="com.sahl.phone" />
+        <package android:name="com.sahl.messages" />
+        <package android:name="com.sahl.files" />
+    </queries>
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
@@ -151,6 +161,19 @@
         <service android:name=".AutoFreezeService" android:exported="false" android:foregroundServiceType="specialUse">
             <property android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE" android:value="Refreezes apps the user chose after the screen turns off" />
         </service>
+        <!-- Sahl Search: its own home-screen icon -->
+        <activity android:name=".SearchActivity" android:exported="true" android:label="@string/s_title"
+            android:icon="@mipmap/ic_search_launcher" android:taskAffinity="com.sahl.tools.search" android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <service android:name=".SearchTile" android:exported="true" android:label="@string/s_title" android:icon="@drawable/ic_search"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter><action android:name="android.service.quicksettings.action.QS_TILE" /></intent-filter>
+        </service>
+        <activity android:name=".CrashActivity" android:exported="false" android:process=":crash" />
         <activity android:name=".CallGuardActivity" android:exported="true" android:label="@string/cg_t"
             android:permission="com.sahl.permission.UNION">
             <!-- Sahl Union: Sahl Phone opens Call Guard settings from here -->

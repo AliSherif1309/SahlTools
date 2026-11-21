@@ -419,4 +419,12 @@ Password: %2$s</string>
     <string name="pr_m_its">Did you mean \"it\'s\" (it is)?</string>
     <string name="pr_m_cap">Start the sentence with a capital letter</string>
     <string name="pr_m_space">Double space</string>
+    <string name="s_title">Sahl Search</string>
+    <string name="s_hint">Search people, messages, calls, notes…</string>
+    <string name="s_intro">One search for all your Sahl apps: contacts, message text, call history and call notes.</string>
+    <string name="s_none">Nothing found</string>
+    <string name="s_people">People</string>
+    <string name="s_messages">Messages</string>
+    <string name="s_calls">Calls & notes</string>
+    <string name="s_files">Files</string>
 </resources>

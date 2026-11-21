@@ -6,4 +6,12 @@
     <color name="text">#1B2A26</color>
     <color name="sub">#5E6B66</color>
     <color name="card">#FFFFFF</color>
+    <color name="tonal">#E4EEE9</color>
+    <color name="line">#E3DED1</color>
+    <color name="ripple">#220B5D4B</color>
+    <color name="danger">#D64545</color>
+    <color name="ok">#1E9E63</color>
+    <color name="w_left">#12463A</color>
+    <color name="w_right">#0A231D</color>
+    <color name="w_gold">#F5C84C</color>
 </resources>

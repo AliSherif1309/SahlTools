@@ -30,7 +30,12 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: "8.9"
-      - run: gradle assembleRelease --no-daemon
+      - name: Build
+        run: |
+          set -o pipefail
+          gradle assembleRelease --no-daemon 2>&1 | tee build.log || {
+            grep -E "^e: |error:|What went wrong|Lint found|Error:" -A2 build.log | head -40 | while IFS= read -r l; do echo "::error::$l"; done
+            exit 1; }
         env:
           KEYSTORE_PASS: ${{ secrets.KEYSTORE_PASS }}
       - name: Name the APK and notes

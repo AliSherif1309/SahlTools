@@ -419,4 +419,12 @@
     <string name="pr_m_its">هل تقصد it\'s (it is)؟</string>
     <string name="pr_m_cap">ابدأ الجملة بحرف كبير</string>
     <string name="pr_m_space">مسافة مزدوجة</string>
+    <string name="s_title">بحث سهل</string>
+    <string name="s_hint">ابحث في الأشخاص والرسائل والمكالمات والملاحظات…</string>
+    <string name="s_intro">بحث واحد في كل تطبيقات سهل: جهات الاتصال ونص الرسائل وسجل المكالمات وملاحظاتها.</string>
+    <string name="s_none">لا توجد نتائج</string>
+    <string name="s_people">الأشخاص</string>
+    <string name="s_messages">الرسائل</string>
+    <string name="s_calls">المكالمات والملاحظات</string>
+    <string name="s_files">الملفات</string>
 </resources>
