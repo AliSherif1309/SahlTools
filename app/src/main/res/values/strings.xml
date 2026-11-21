@@ -425,6 +425,6 @@ Password: %2$s</string>
     <string name="s_none">Nothing found</string>
     <string name="s_people">People</string>
     <string name="s_messages">Messages</string>
-    <string name="s_calls">Calls & notes</string>
+    <string name="s_calls">Calls &amp; notes</string>
     <string name="s_files">Files</string>
 </resources>
