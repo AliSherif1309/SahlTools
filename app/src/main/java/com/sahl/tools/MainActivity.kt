@@ -347,6 +347,17 @@ class MainActivity : Activity() {
                     Updater.downloadAndInstall(this, r)
                     Toast.makeText(this, Updater.downloadingText(this), Toast.LENGTH_LONG).show()
                 }
+                if (!isFinishing && !isDestroyed) {
+                    android.app.AlertDialog.Builder(this)
+                        .setTitle(Updater.availableText(this, r))
+                        .setMessage(r.notes.ifBlank { Updater.tr(this, "A new version of Sahl Tools is ready.", "إصدار جديد من أدوات سهل جاهز.") })
+                        .setPositiveButton(Updater.updateNowText(this)) { _, _ ->
+                            Updater.downloadAndInstall(this, r)
+                            Toast.makeText(this, Updater.downloadingText(this), Toast.LENGTH_LONG).show()
+                        }
+                        .setNegativeButton(Updater.tr(this, "Later", "لاحقًا"), null)
+                        .show()
+                }
                 if (manual) {
                     Toast.makeText(this, Updater.availableText(this, r), Toast.LENGTH_LONG).show()
                     (updateBar.parent?.parent as? ScrollView)?.smoothScrollTo(0, 0)
