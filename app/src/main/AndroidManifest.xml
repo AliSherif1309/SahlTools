@@ -4,6 +4,12 @@
     <permission android:name="com.sahl.permission.UNION" android:label="Sahl apps" android:protectionLevel="signature" />
     <uses-permission android:name="com.sahl.permission.UNION" />
     <queries>
+        <package android:name="com.sahl.pdf" />
+        <package android:name="com.aly.trueqibla" />
+        <package android:name="com.aly.sahlsync" />
+        <package android:name="com.sahl.adhan" />
+        <package android:name="com.sahl.gallery" />
+        <package android:name="com.sahl.camera" />
         <provider android:authorities="com.sahl.contacts.union" />
         <provider android:authorities="com.sahl.phone.union" />
         <provider android:authorities="com.sahl.messages.union" />

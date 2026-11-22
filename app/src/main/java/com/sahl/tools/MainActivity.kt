@@ -107,7 +107,7 @@ class MainActivity : Activity() {
 
         // Search + category shortcuts
         val search = android.widget.EditText(this).apply {
-            hint = "🔍  " + getString(R.string.search_tools); typeface = font; setSingleLine(); textSize = 16f
+            hint = getString(R.string.search_tools); typeface = font; setSingleLine(); textSize = 16f
             addTextChangedListener(object : android.text.TextWatcher {
                 override fun afterTextChanged(e: android.text.Editable?) = filter(e.toString())
                 override fun beforeTextChanged(a: CharSequence?, b: Int, c: Int, d: Int) {}
@@ -121,7 +121,7 @@ class MainActivity : Activity() {
         noMatch = text(getString(R.string.search_none), 15f, R.color.sub).apply { visibility = View.GONE; setPadding(dp(4), dp(12), 0, dp(12)) }
         list.addView(noMatch)
 
-        val quick = section(list, "⚡  " + getString(R.string.sec_quick))
+        val quick = section(list, getString(R.string.sec_quick))
         for (k in Tools.ALL) {
             val v = card(k)
             list.addView(v, LinearLayout.LayoutParams(-1, -2).apply { bottomMargin = dp(12) })
@@ -135,6 +135,14 @@ class MainActivity : Activity() {
 
         list.addView(button(getString(R.string.check_updates) + "  ·  v" + BuildConfig.VERSION_NAME) { checkUpdate(true) })
         list.addView(text(getString(R.string.battery_hint), 13f, R.color.sub).apply { setPadding(dp(4), dp(8), dp(4), 0) })
+        val uCard = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL; background = rounded(R.color.card, 22)
+            setPadding(dp(16), dp(12), dp(16), dp(12))
+        }
+        val goldHdr = if ((resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) == android.content.res.Configuration.UI_MODE_NIGHT_YES) 0xFFF5C84C.toInt() else 0xFFB88922.toInt()
+        uCard.addView(text(if (resources.configuration.locales[0].language == "ar") "اتحاد سهل" else "Sahl Union", 13f, goldHdr, true))
+        uCard.addView(SahlUnionApps.strip(this, getColor(R.color.sub)))
+        list.addView(uCard, LinearLayout.LayoutParams(-1, -2).apply { topMargin = dp(14) })
         scroller = ScrollView(this).apply { addView(list) }
         setContentView(scroller)
 
@@ -282,7 +290,7 @@ class MainActivity : Activity() {
             R.string.add_tile to { addTile(ScanTile::class.java, R.string.scan_t, R.drawable.ic_scan) })
         add(R.string.cg_t, R.string.cg_d, R.drawable.ic_shield,
             R.string.open to { startActivity(Intent(this, CallGuardActivity::class.java)) })
-        current = section(col, "📱  " + getString(R.string.sec_apps))
+        current = section(col, getString(R.string.sec_apps))
         add(R.string.fr_t, R.string.fr_d, R.drawable.ic_freeze,
             R.string.open to { startActivity(Intent(this, FreezerActivity::class.java)) },
             R.string.add_tile to { addTile(FreezeTile::class.java, R.string.fr_t, R.drawable.ic_freeze) })
