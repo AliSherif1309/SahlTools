@@ -325,7 +325,7 @@ class FreezerActivity : Activity() {
         val holder = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
         val cards = list.sortedBy { appName(it).lowercase() }.map { pkg -> (appName(pkg) + " " + pkg).lowercase() to appCard(pkg) }
         col.addView(EditText(this).apply {
-            hint = "🔍  " + getString(R.string.fr_search); typeface = sahlFont(); setSingleLine(); setText(query)
+            hint = getString(R.string.fr_search); typeface = sahlFont(); setSingleLine(); setText(query)
             addTextChangedListener(object : TextWatcher {
                 override fun afterTextChanged(e: Editable?) {
                     query = e.toString().lowercase()

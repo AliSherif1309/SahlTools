@@ -88,7 +88,7 @@ class TouchLockService : Service() {
         super.onCreate()
         val wm = getSystemService(WindowManager::class.java)
         val badge = TextView(this).apply {
-            text = "🔒  " + getString(R.string.tap3)
+            text = getString(R.string.tap3)
             setTextColor(Color.WHITE); textSize = 14f
             typeface = resources.getFont(R.font.thmanyah)
             setPadding(dp(18), dp(10), dp(18), dp(10))

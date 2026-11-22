@@ -202,7 +202,7 @@ class DebloatActivity : Activity() {
         t.addView(label(pkg, 10f, R.color.sub))
         val chips = LinearLayout(this).apply { setPadding(0, dp(3), 0, 0) }
         when {
-            locked -> chips.addView(chip("🔒 " + getString(R.string.db_keep), 0xFF616161.toInt()))
+            locked -> chips.addView(chip(getString(R.string.db_keep), 0xFF616161.toInt()))
             info?.level == Bloat.SAFE -> chips.addView(chip("✓ " + getString(R.string.db_safe), 0xFF2E7D32.toInt()))
             info?.level == Bloat.CAUTION -> chips.addView(chip("⚠ " + getString(R.string.db_caution), 0xFFE65100.toInt()))
         }

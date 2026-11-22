@@ -224,8 +224,8 @@ class CallGuardActivity : Activity() {
         box.addView(label(n, 18f, bold = true))
         box.addView(sahlButton("⛔  " + getString(R.string.cg_add_block)) { CallGuard.saveList(this, "block", CallGuard.list(this, "block") + n); draw() })
         box.addView(sahlButton("✓  " + getString(R.string.cg_add_allow)) { CallGuard.saveList(this, "allow", CallGuard.list(this, "allow") + n); draw() })
-        box.addView(sahlButton("📞  " + getString(R.string.cg_call_back)) { startActivity(Intent(Intent.ACTION_DIAL, Uri.parse("tel:$n"))) })
-        box.addView(sahlButton("🔍  " + getString(R.string.cg_lookup)) { openLink("https://www.google.com/search?q=" + Uri.encode(n)) })
+        box.addView(sahlButton(getString(R.string.cg_call_back)) { startActivity(Intent(Intent.ACTION_DIAL, Uri.parse("tel:$n"))) })
+        box.addView(sahlButton(getString(R.string.cg_lookup)) { openLink("https://www.google.com/search?q=" + Uri.encode(n)) })
         sahlDialog(getString(R.string.cg_t), box, getString(android.R.string.ok) to { d: android.app.AlertDialog -> d.dismiss() })
     }
 

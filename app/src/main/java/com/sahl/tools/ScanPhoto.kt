@@ -134,10 +134,10 @@ class PhotoActivity : Activity() {
                 if (!alt.isNaN()) "  (${alt.toInt()} m)" else "")
         }
         val cam = listOfNotNull(e.getAttribute(ExifInterface.TAG_MAKE), e.getAttribute(ExifInterface.TAG_MODEL)).joinToString(" ").trim()
-        if (cam.isNotEmpty()) lines.add("📱  " + getString(R.string.ex_camera, cam))
-        e.getAttribute("LensModel")?.let { lines.add("🔍  " + getString(R.string.ex_lens, it)) }
+        if (cam.isNotEmpty()) lines.add(getString(R.string.ex_camera, cam))
+        e.getAttribute("LensModel")?.let { lines.add(getString(R.string.ex_lens, it)) }
         (e.getAttribute(ExifInterface.TAG_DATETIME_ORIGINAL) ?: e.getAttribute(ExifInterface.TAG_DATETIME))?.let {
-            lines.add("🕒  " + getString(R.string.ex_date, it))
+            lines.add(getString(R.string.ex_date, it))
         }
         val settings = listOfNotNull(
             e.getAttribute(ExifInterface.TAG_F_NUMBER)?.let { "f/$it" },
@@ -150,7 +150,7 @@ class PhotoActivity : Activity() {
             ?.let { lines.add("👤  " + getString(R.string.ex_owner, it.joinToString(" · "))) }
         e.getAttribute(ExifInterface.TAG_IMAGE_UNIQUE_ID)?.let { lines.add("🆔  " + getString(R.string.ex_id)) }
         val count = tags.count { e.getAttribute(it) != null }
-        if (count > 0) lines.add("🧹  " + getString(R.string.ex_total, count))
+        if (count > 0) lines.add(getString(R.string.ex_total, count))
         return lines
     }
 
