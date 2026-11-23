@@ -81,7 +81,22 @@ class MainActivity : Activity() {
         val list = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(dp(16), dp(20), dp(16), dp(32)) }
 
         // Header
-        list.addView(text(getString(R.string.app_name), 30f, R.color.emerald, true))
+        val headerRow = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+        }
+        val seal = text("۞", 19f, R.color.gold, true).apply {
+            gravity = Gravity.CENTER
+            background = GradientDrawable().apply {
+                cornerRadius = dp(13).toFloat()
+                setColor(getColor(R.color.tonal))
+                setStroke(dp(1), getColor(R.color.gold))
+            }
+            setOnClickListener { openSahlSuiteSwitcher() }
+        }
+        headerRow.addView(seal, LinearLayout.LayoutParams(dp(36), dp(36)).apply { marginEnd = dp(10) })
+        headerRow.addView(text(getString(R.string.app_name), 30f, R.color.emerald, true), LinearLayout.LayoutParams(0, -2, 1f))
+        list.addView(headerRow)
         list.addView(text(getString(R.string.tagline), 15f, R.color.sub).apply { setPadding(0, dp(2), 0, dp(12)) })
         updateBar = text("", 14f, R.color.emerald_dark, true).apply {
             visibility = View.GONE; background = rounded(R.color.gold, 14)
@@ -372,5 +387,95 @@ class MainActivity : Activity() {
                 }
             }
         }.start()
+    }
+
+    private fun openSahlSuiteSwitcher() {
+        try {
+            val i = Intent().apply {
+                setClassName("com.sahl.home", "com.sahl.home.SahlPopupActivity")
+                putExtra("folder", "all_sahl")
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+            startActivity(i)
+        } catch (_: Exception) {
+            showSahlSuiteSheet()
+        }
+    }
+
+    private fun showSahlSuiteSheet() {
+        val pkgs = listOf(
+            "com.sahl.home",
+            "com.sahl.phone",
+            "com.sahl.contacts",
+            "com.sahl.messages",
+            "com.sahl.adhan",
+            "com.aly.trueqibla",
+            "com.sahl.qibla",
+            "com.sahl.files",
+            "com.sahl.gallery",
+            "com.sahl.camera",
+            "com.sahl.pdf",
+            "com.sahl.timer",
+            "com.aly.sahlsync"
+        )
+        val pm = packageManager
+        val ar = resources.configuration.locales[0].language == "ar"
+        val installed = pkgs.mapNotNull { pkg ->
+            val launch = pm.getLaunchIntentForPackage(pkg) ?: return@mapNotNull null
+            val label = try {
+                pm.getApplicationLabel(pm.getApplicationInfo(pkg, 0)).toString()
+            } catch (_: Exception) { pkg }
+            val appIcon = try { pm.getApplicationIcon(pkg) } catch (_: Exception) { null }
+            Triple(label, appIcon, launch)
+        }
+        val d = android.app.Dialog(this)
+        d.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE)
+        val box = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            background = GradientDrawable().apply {
+                cornerRadius = dp(26).toFloat()
+                setColor(getColor(R.color.card))
+                setStroke(dp(1), getColor(R.color.gold))
+            }
+            setPadding(dp(16), dp(18), dp(16), dp(16))
+        }
+        box.addView(text(if (ar) "۞  تطبيقات سهل" else "۞  Sahl Suite", 19f, R.color.emerald, true).apply {
+            setPadding(dp(6), 0, dp(6), dp(12))
+        })
+        if (installed.isEmpty()) {
+            box.addView(text(if (ar) "لا توجد تطبيقات سهل أخرى مثبتة" else "No other Sahl apps installed", 14f, R.color.sub).apply {
+                setPadding(dp(6), dp(4), dp(6), dp(8))
+            })
+        } else {
+            val scroll = ScrollView(this)
+            val list = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
+            for ((label, appIcon, launch) in installed) {
+                val row = LinearLayout(this).apply {
+                    orientation = LinearLayout.HORIZONTAL
+                    gravity = Gravity.CENTER_VERTICAL
+                    setPadding(dp(10), dp(9), dp(10), dp(9))
+                    setOnClickListener {
+                        d.dismiss()
+                        try { startActivity(launch.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) } catch (_: Exception) {}
+                    }
+                }
+                if (appIcon != null) {
+                    row.addView(ImageView(this).apply { setImageDrawable(appIcon) },
+                        LinearLayout.LayoutParams(dp(34), dp(34)).apply { marginEnd = dp(12) })
+                }
+                row.addView(text(label, 15.5f, R.color.text, true), LinearLayout.LayoutParams(0, -2, 1f))
+                list.addView(row)
+            }
+            scroll.addView(list)
+            box.addView(scroll, LinearLayout.LayoutParams(-1, -2))
+        }
+        d.setContentView(box)
+        d.window?.apply {
+            setBackgroundDrawableResource(android.R.color.transparent)
+            setGravity(Gravity.BOTTOM)
+            setLayout(-1, -2)
+            attributes.y = dp(16)
+        }
+        d.show()
     }
 }
