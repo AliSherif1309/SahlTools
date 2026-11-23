@@ -351,10 +351,20 @@ abstract class SahlActivity : Activity() {
     fun header(title: String, back: Boolean, actions: List<Pair<Any, () -> Unit>> = emptyList(), large: Boolean = !back): LinearLayout {
         val bar = LinearLayout(this).apply {
             gravity = Gravity.CENTER_VERTICAL
-            setPadding(px(if (back) 8 else 20), px(14), px(12), px(8))
+            setPadding(px(if (back) 8 else 16), px(14), px(12), px(8))
         }
-        if (back) bar.addView(iconButton(R.drawable.ic_back, 0, col(R.color.text)) { finish() })
-        bar.addView(text(title, if (large) 28f else 20f, col(R.color.text), true).apply {
+        if (back) {
+            bar.addView(iconButton(R.drawable.ic_back, 0, col(R.color.text)) { finish() })
+        } else {
+            val seal = text("۞", 19f, col(R.color.gold), true).apply {
+                gravity = Gravity.CENTER
+                background = round(col(R.color.tonal), 13f, col(R.color.gold))
+                setOnClickListener { openSahlSuiteSwitcher() }
+            }.press(13f)
+            bar.addView(seal, LinearLayout.LayoutParams(px(36), px(36)).apply { marginEnd = px(10) })
+        }
+        val cleanTitle = title.removePrefix("۞").trimStart()
+        bar.addView(text(cleanTitle, if (large) 28f else 20f, col(R.color.text), true).apply {
             setPadding(px(if (back) 6 else 0), 0, 0, 0); maxLines = 1; ellipsize = android.text.TextUtils.TruncateAt.END
         }, LinearLayout.LayoutParams(0, -2, 1f))
         for ((a, go) in actions) {
@@ -363,6 +373,95 @@ abstract class SahlActivity : Activity() {
             bar.addView(v)
         }
         return bar
+    }
+
+    /** Opens SahlHome's floating Sahl Apps popup, or falls back to an in-app Sahl Suite bottom sheet. */
+    fun openSahlSuiteSwitcher() {
+        try {
+            val i = Intent().apply {
+                setClassName("com.sahl.home", "com.sahl.home.SahlPopupActivity")
+                putExtra("folder", "all_sahl")
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+            startActivity(i)
+        } catch (_: Exception) {
+            showSahlSuiteSheet()
+        }
+    }
+
+    private fun showSahlSuiteSheet() {
+        val pkgs = listOf(
+            "com.sahl.home",
+            "com.sahl.phone",
+            "com.sahl.contacts",
+            "com.sahl.messages",
+            "com.sahl.adhan",
+            "com.aly.trueqibla",
+            "com.sahl.qibla",
+            "com.sahl.files",
+            "com.sahl.gallery",
+            "com.sahl.camera",
+            "com.sahl.pdf",
+            "com.sahl.tools",
+            "com.sahl.timer",
+            "com.aly.sahlsync"
+        )
+        val pm = packageManager
+        val ar = resources.configuration.locales[0].language == "ar"
+        val installed = pkgs.mapNotNull { pkg ->
+            if (pkg == packageName) return@mapNotNull null
+            val launch = pm.getLaunchIntentForPackage(pkg) ?: return@mapNotNull null
+            val label = try {
+                pm.getApplicationLabel(pm.getApplicationInfo(pkg, 0)).toString()
+            } catch (_: Exception) { pkg }
+            val appIcon = try { pm.getApplicationIcon(pkg) } catch (_: Exception) { null }
+            Triple(label, appIcon, launch)
+        }
+        val d = android.app.Dialog(this)
+        d.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE)
+        val box = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            background = round(col(R.color.card), 26f, col(R.color.gold))
+            setPadding(px(16), px(18), px(16), px(16))
+        }
+        box.addView(text(if (ar) "۞  تطبيقات سهل" else "۞  Sahl Suite", 19f, col(R.color.emerald), true).apply {
+            setPadding(px(6), 0, px(6), px(12))
+        })
+        if (installed.isEmpty()) {
+            box.addView(text(if (ar) "لا توجد تطبيقات سهل أخرى مثبتة" else "No other Sahl apps installed", 14f, col(R.color.sub)).apply {
+                setPadding(px(6), px(4), px(6), px(8))
+            })
+        } else {
+            val scroll = android.widget.ScrollView(this)
+            val list = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
+            for ((label, appIcon, launch) in installed) {
+                val row = LinearLayout(this).apply {
+                    orientation = LinearLayout.HORIZONTAL
+                    gravity = Gravity.CENTER_VERTICAL
+                    setPadding(px(10), px(9), px(10), px(9))
+                    setOnClickListener {
+                        d.dismiss()
+                        try { startActivity(launch.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) } catch (_: Exception) {}
+                    }
+                }.press(16f)
+                if (appIcon != null) {
+                    row.addView(ImageView(this).apply { setImageDrawable(appIcon) },
+                        LinearLayout.LayoutParams(px(34), px(34)).apply { marginEnd = px(12) })
+                }
+                row.addView(text(label, 15.5f, col(R.color.text), true), LinearLayout.LayoutParams(0, -2, 1f))
+                list.addView(row)
+            }
+            scroll.addView(list)
+            box.addView(scroll, LinearLayout.LayoutParams(-1, -2))
+        }
+        d.setContentView(box)
+        d.window?.apply {
+            setBackgroundDrawableResource(android.R.color.transparent)
+            setGravity(Gravity.BOTTOM)
+            setLayout(-1, -2)
+            attributes.y = px(16)
+        }
+        d.show()
     }
 
     /** Pill search box with a magnifier icon. */

@@ -35,6 +35,19 @@
     <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
     <uses-permission android:name="android.permission.INTERNET" />
     <queries>
+        <package android:name="com.sahl.home" />
+        <package android:name="com.sahl.phone" />
+        <package android:name="com.sahl.contacts" />
+        <package android:name="com.sahl.messages" />
+        <package android:name="com.sahl.adhan" />
+        <package android:name="com.aly.trueqibla" />
+        <package android:name="com.sahl.qibla" />
+        <package android:name="com.sahl.files" />
+        <package android:name="com.sahl.gallery" />
+        <package android:name="com.sahl.camera" />
+        <package android:name="com.sahl.pdf" />
+        <package android:name="com.sahl.timer" />
+        <package android:name="com.aly.sahlsync" />
         <intent>
             <action android:name="android.intent.action.VIEW" />
             <data android:scheme="https" />
