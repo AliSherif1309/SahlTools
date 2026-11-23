@@ -140,7 +140,7 @@ class MainActivity : Activity() {
             setPadding(dp(16), dp(12), dp(16), dp(12))
         }
         val goldHdr = if ((resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) == android.content.res.Configuration.UI_MODE_NIGHT_YES) 0xFFF5C84C.toInt() else 0xFFB88922.toInt()
-        uCard.addView(text(if (resources.configuration.locales[0].language == "ar") "اتحاد سهل" else "Sahl Union", 13f, goldHdr, true))
+        uCard.addView(text(if (resources.configuration.locales[0].language == "ar") "اتحاد سهل" else "Sahl Union", 13f, R.color.emerald, true).apply { setTextColor(goldHdr) })
         uCard.addView(SahlUnionApps.strip(this, getColor(R.color.sub)))
         list.addView(uCard, LinearLayout.LayoutParams(-1, -2).apply { topMargin = dp(14) })
         scroller = ScrollView(this).apply { addView(list) }
