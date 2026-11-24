@@ -372,7 +372,41 @@ abstract class SahlActivity : Activity() {
             else text(a.toString(), 20f).apply { setPadding(px(12), px(8), px(12), px(8)); setOnClickListener { go() } }.press(16f)
             bar.addView(v)
         }
-        return bar
+        val occ = if (!back) sahlOccasionText() else null
+        if (occ == null) return bar
+        return LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            addView(bar)
+            addView(text(occ, 12.5f, col(R.color.emerald), true).apply {
+                gravity = Gravity.CENTER
+                background = round(col(R.color.tonal), 12f, col(R.color.gold))
+                setPadding(px(12), px(6), px(12), px(6))
+            }, LinearLayout.LayoutParams(-1, -2).apply {
+                marginStart = px(16); marginEnd = px(16); bottomMargin = px(6)
+            })
+        }
+    }
+
+    private fun sahlOccasionText(): String? {
+        val ar = resources.configuration.locales[0].language == "ar"
+        try {
+            val h = java.time.chrono.HijrahDate.now()
+            val m = h.get(java.time.temporal.ChronoField.MONTH_OF_YEAR)
+            val d = h.get(java.time.temporal.ChronoField.DAY_OF_MONTH)
+            when {
+                m == 9 -> return if (ar) "🌙  رمضان مبارك · تقبل الله صيامكم" else "🌙  Ramadan Mubarak"
+                m == 10 && d in 1..3 -> return if (ar) "✨  عيد فطر مبارك · تقبل الله منا ومنكم" else "✨  Eid al-Fitr Mubarak"
+                m == 12 && d == 9 -> return if (ar) "🤲  يوم عرفة المبارك" else "🤲  Blessed Day of Arafah"
+                m == 12 && d in 10..13 -> return if (ar) "✨  عيد أضحى مبارك" else "✨  Eid al-Adha Mubarak"
+                m == 1 && d == 1 -> return if (ar) "۞  عام هجري مبارك" else "۞  Blessed Hijri New Year"
+                m == 1 && d == 10 -> return if (ar) "۞  عاشوراء المبارك" else "۞  Day of Ashura"
+            }
+        } catch (_: Exception) {}
+        val cal = java.util.Calendar.getInstance()
+        if (cal.get(java.util.Calendar.DAY_OF_WEEK) == java.util.Calendar.FRIDAY) {
+            return if (ar) "۞  جمعة مباركة · لا تنسَ سورة الكهف" else "۞  Jumu'ah Mubarak · Blessed Friday"
+        }
+        return null
     }
 
     /** Opens SahlHome's floating Sahl Apps popup, or falls back to an in-app Sahl Suite bottom sheet. */
