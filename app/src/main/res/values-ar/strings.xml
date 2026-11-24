@@ -319,6 +319,7 @@
     <string name="cg_o_repeat">السماح لرقم مجهول إذا اتصل مرتين خلال ٥ دقائق (أمر عاجل)</string>
     <string name="cg_o_reject">رفض المكالمات المحظورة (إيقافه = كتمها فقط)</string>
     <string name="cg_o_notify">إظهار إشعار هادئ عند حظر مكالمة</string>
+    <string name="cg_o_notify_silent">تنبيه بصوت سهل هادئ عند كتم مكالمة واردة</string>
     <string name="cg_blocklist">قائمة الحظر</string>
     <string name="cg_block_hint">رقم أو بداية رقم، مثل ‎+234 أو ‎0800*</string>
     <string name="cg_allowlist">السماح دائمًا</string>
@@ -334,6 +335,8 @@
     <string name="cg_lookup">ابحث عن الرقم في الإنترنت</string>
     <string name="cg_n_blocked">تم حظر مكالمة من %1$s</string>
     <string name="cg_n_silenced">تم كتم مكالمة من %1$s</string>
+    <string name="cg_ch_silenced">المكالمات الواردة المكتومة</string>
+    <string name="cg_n_silenced_incoming">مكالمة واردة مكتومة من %1$s</string>
     <string name="cg_r_ok">مسموح</string>
     <string name="cg_r_hidden">رقم مخفي</string>
     <string name="cg_r_allowlist">في قائمة السماح</string>
