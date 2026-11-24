@@ -98,6 +98,17 @@ class MainActivity : Activity() {
         headerRow.addView(text(getString(R.string.app_name), 30f, R.color.emerald, true), LinearLayout.LayoutParams(0, -2, 1f))
         list.addView(headerRow)
         list.addView(text(getString(R.string.tagline), 15f, R.color.sub).apply { setPadding(0, dp(2), 0, dp(12)) })
+        sahlOccasionText()?.let { occ ->
+            list.addView(text(occ, 12.5f, R.color.emerald, true).apply {
+                gravity = Gravity.CENTER
+                background = GradientDrawable().apply {
+                    cornerRadius = dp(12).toFloat()
+                    setColor(getColor(R.color.tonal))
+                    setStroke(dp(1), getColor(R.color.gold))
+                }
+                setPadding(dp(12), dp(6), dp(12), dp(6))
+            }, LinearLayout.LayoutParams(-1, -2).apply { bottomMargin = dp(12) })
+        }
         updateBar = text("", 14f, R.color.emerald_dark, true).apply {
             visibility = View.GONE; background = rounded(R.color.gold, 14)
             setPadding(dp(14), dp(10), dp(14), dp(10)); gravity = Gravity.CENTER
@@ -477,5 +488,27 @@ class MainActivity : Activity() {
             attributes.y = dp(16)
         }
         d.show()
+    }
+
+    private fun sahlOccasionText(): String? {
+        val ar = resources.configuration.locales[0].language == "ar"
+        try {
+            val h = java.time.chrono.HijrahDate.now()
+            val m = h.get(java.time.temporal.ChronoField.MONTH_OF_YEAR)
+            val d = h.get(java.time.temporal.ChronoField.DAY_OF_MONTH)
+            when {
+                m == 9 -> return if (ar) "🌙  رمضان مبارك · تقبل الله صيامكم" else "🌙  Ramadan Mubarak"
+                m == 10 && d in 1..3 -> return if (ar) "✨  عيد فطر مبارك · تقبل الله منا ومنكم" else "✨  Eid al-Fitr Mubarak"
+                m == 12 && d == 9 -> return if (ar) "🤲  يوم عرفة المبارك" else "🤲  Blessed Day of Arafah"
+                m == 12 && d in 10..13 -> return if (ar) "✨  عيد أضحى مبارك" else "✨  Eid al-Adha Mubarak"
+                m == 1 && d == 1 -> return if (ar) "۞  عام هجري مبارك" else "۞  Blessed Hijri New Year"
+                m == 1 && d == 10 -> return if (ar) "۞  عاشوراء المبارك" else "۞  Day of Ashura"
+            }
+        } catch (_: Exception) {}
+        val cal = java.util.Calendar.getInstance()
+        if (cal.get(java.util.Calendar.DAY_OF_WEEK) == java.util.Calendar.FRIDAY) {
+            return if (ar) "۞  جمعة مباركة · لا تنسَ سورة الكهف" else "۞  Jumu'ah Mubarak · Blessed Friday"
+        }
+        return null
     }
 }
