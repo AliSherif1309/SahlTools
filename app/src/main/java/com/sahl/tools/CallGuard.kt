@@ -114,16 +114,33 @@ class SahlCallScreening : CallScreeningService() {
         }
         respondToCall(d, r.build())
         CallGuard.addLog(this, number, action, reason)
-        if (action != CallGuard.ALLOW && CallGuard.opt(this, "notify", true)) notifyBlocked(number, action, reason)
+        if (action == CallGuard.BLOCK && CallGuard.opt(this, "notify", true)) notifyBlocked(number, reason)
+        else if (action == CallGuard.SILENCE && CallGuard.opt(this, "notify_silent", true)) notifySilenced(number, reason)
     }
 
-    private fun notifyBlocked(number: String?, action: Int, reason: Int) {
+    private fun notifyBlocked(number: String?, reason: Int) {
         val nm = getSystemService(NotificationManager::class.java)
         nm.createNotificationChannel(NotificationChannel("calls", getString(R.string.cg_t), NotificationManager.IMPORTANCE_LOW))
         val open = PendingIntent.getActivity(this, 21, Intent(this, CallGuardActivity::class.java), PendingIntent.FLAG_IMMUTABLE)
         nm.notify(2100 + (System.currentTimeMillis() % 50).toInt(), Notification.Builder(this, "calls").setSmallIcon(R.drawable.ic_shield)
-            .setContentTitle(getString(if (action == CallGuard.BLOCK) R.string.cg_n_blocked else R.string.cg_n_silenced, number ?: getString(R.string.cg_hidden)))
+            .setContentTitle(getString(R.string.cg_n_blocked, number ?: getString(R.string.cg_hidden)))
             .setContentText(getString(reason)).setContentIntent(open).setAutoCancel(true).build())
+    }
+
+    private fun notifySilenced(number: String?, reason: Int) {
+        val nm = getSystemService(NotificationManager::class.java)
+        nm.createNotificationChannel(Sahl.silentCallChannel(this, "calls_silenced", getString(R.string.cg_ch_silenced)))
+        val launch = packageManager.getLaunchIntentForPackage("com.sahl.phone") ?: Intent(this, CallGuardActivity::class.java)
+        val open = PendingIntent.getActivity(this, 22, launch, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
+        nm.notify(2200 + (System.currentTimeMillis() % 50).toInt(), Notification.Builder(this, "calls_silenced")
+            .setSmallIcon(R.drawable.ic_shield)
+            .setCategory(Notification.CATEGORY_CALL)
+            .setVisibility(Notification.VISIBILITY_PUBLIC)
+            .setContentTitle(getString(R.string.cg_n_silenced_incoming, number ?: getString(R.string.cg_hidden)))
+            .setContentText(getString(reason))
+            .setContentIntent(open)
+            .setAutoCancel(true)
+            .build())
     }
 }
 
@@ -160,7 +177,8 @@ class CallGuardActivity : Activity() {
         col.addSpaced(card().apply {
             for ((k, def, t) in listOf(Triple("spoofed", true, R.string.cg_o_spoofed), Triple("hidden", true, R.string.cg_o_hidden),
                 Triple("foreign", false, R.string.cg_o_foreign), Triple("unknown", false, R.string.cg_o_unknown),
-                Triple("repeat", true, R.string.cg_o_repeat), Triple("reject", true, R.string.cg_o_reject), Triple("notify", true, R.string.cg_o_notify)))
+                Triple("repeat", true, R.string.cg_o_repeat), Triple("reject", true, R.string.cg_o_reject),
+                Triple("notify", true, R.string.cg_o_notify), Triple("notify_silent", true, R.string.cg_o_notify_silent)))
                 addView(Switch(this@CallGuardActivity).apply {
                     text = getString(t); typeface = sahlFont(); textSize = 15f; setTextColor(getColor(R.color.text))
                     setPadding(0, dp(8), 0, dp(8)); isChecked = CallGuard.opt(this@CallGuardActivity, k, def)

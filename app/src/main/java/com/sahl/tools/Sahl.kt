@@ -92,6 +92,19 @@ object Sahl {
             enableVibration(true)
         }
 
+    /** Gentle Sahl chime for silenced incoming calls (res/raw/sahl_silent_call). */
+    fun silentCallChime(c: Context): Uri = Uri.parse("android.resource://${c.packageName}/raw/sahl_silent_call")
+
+    /** Dedicated high-priority notification channel for silenced incoming calls with its own gentle Sahl sound. */
+    fun silentCallChannel(c: Context, id: String, name: String) =
+        android.app.NotificationChannel(id, name, android.app.NotificationManager.IMPORTANCE_HIGH).apply {
+            setSound(silentCallChime(c), android.media.AudioAttributes.Builder()
+                .setUsage(android.media.AudioAttributes.USAGE_NOTIFICATION)
+                .setContentType(android.media.AudioAttributes.CONTENT_TYPE_SONIFICATION).build())
+            enableVibration(false)
+            lockscreenVisibility = android.app.Notification.VISIBILITY_PUBLIC
+        }
+
     /** Saves any crash so the app can show it on the next start (shared Sahl debug helper). */
     fun catchCrashes(c: Context) {
         val app = c.applicationContext

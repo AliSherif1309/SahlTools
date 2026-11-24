@@ -319,6 +319,7 @@ Password: %2$s</string>
     <string name="cg_o_repeat">Let an unknown number through if it calls twice within 5 minutes (urgent)</string>
     <string name="cg_o_reject">Reject blocked calls (off = just silence them)</string>
     <string name="cg_o_notify">Show a quiet notification when a call is blocked</string>
+    <string name="cg_o_notify_silent">Notify with a gentle Sahl sound when a call is silenced</string>
     <string name="cg_blocklist">Block list</string>
     <string name="cg_block_hint">Number or start of number, e.g. +234 or 0800* </string>
     <string name="cg_allowlist">Always allow</string>
@@ -334,6 +335,8 @@ Password: %2$s</string>
     <string name="cg_lookup">Search this number online</string>
     <string name="cg_n_blocked">Blocked call from %1$s</string>
     <string name="cg_n_silenced">Silenced call from %1$s</string>
+    <string name="cg_ch_silenced">Silenced incoming calls</string>
+    <string name="cg_n_silenced_incoming">Incoming silenced call from %1$s</string>
     <string name="cg_r_ok">Allowed</string>
     <string name="cg_r_hidden">Hidden number</string>
     <string name="cg_r_allowlist">On your allow list</string>
