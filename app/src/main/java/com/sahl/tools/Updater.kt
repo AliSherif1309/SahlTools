@@ -82,7 +82,7 @@ object Updater {
         val launch = ctx.packageManager.getLaunchIntentForPackage(ctx.packageName) ?: return
         val open = PendingIntent.getActivity(ctx, 5, launch, PendingIntent.FLAG_IMMUTABLE)
         try {
-            nm.notify(500, Notification.Builder(ctx, "updates").setSmallIcon(android.R.drawable.stat_sys_download_done)
+            nm.notify(500, SahlNotif.apply(ctx, Notification.Builder(ctx, "updates"))
                 .setContentTitle(availableText(ctx, r))
                 .setContentText(r.notes.ifBlank { updateNowText(ctx) })
                 .setContentIntent(open).setAutoCancel(true).build())

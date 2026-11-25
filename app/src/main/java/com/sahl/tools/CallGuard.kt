@@ -122,7 +122,7 @@ class SahlCallScreening : CallScreeningService() {
         val nm = getSystemService(NotificationManager::class.java)
         nm.createNotificationChannel(NotificationChannel("calls", getString(R.string.cg_t), NotificationManager.IMPORTANCE_LOW))
         val open = PendingIntent.getActivity(this, 21, Intent(this, CallGuardActivity::class.java), PendingIntent.FLAG_IMMUTABLE)
-        nm.notify(2100 + (System.currentTimeMillis() % 50).toInt(), Notification.Builder(this, "calls").setSmallIcon(R.drawable.ic_shield)
+        nm.notify(2100 + (System.currentTimeMillis() % 50).toInt(), SahlNotif.apply(this, Notification.Builder(this, "calls"))
             .setContentTitle(getString(R.string.cg_n_blocked, number ?: getString(R.string.cg_hidden)))
             .setContentText(getString(reason)).setContentIntent(open).setAutoCancel(true).build())
     }
@@ -132,8 +132,7 @@ class SahlCallScreening : CallScreeningService() {
         nm.createNotificationChannel(Sahl.silentCallChannel(this, "calls_silenced", getString(R.string.cg_ch_silenced)))
         val launch = packageManager.getLaunchIntentForPackage("com.sahl.phone") ?: Intent(this, CallGuardActivity::class.java)
         val open = PendingIntent.getActivity(this, 22, launch, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
-        nm.notify(2200 + (System.currentTimeMillis() % 50).toInt(), Notification.Builder(this, "calls_silenced")
-            .setSmallIcon(R.drawable.ic_shield)
+        nm.notify(2200 + (System.currentTimeMillis() % 50).toInt(), SahlNotif.apply(this, Notification.Builder(this, "calls_silenced"))
             .setCategory(Notification.CATEGORY_CALL)
             .setVisibility(Notification.VISIBILITY_PUBLIC)
             .setContentTitle(getString(R.string.cg_n_silenced_incoming, number ?: getString(R.string.cg_hidden)))
