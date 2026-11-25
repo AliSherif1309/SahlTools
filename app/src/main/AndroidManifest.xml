@@ -4,7 +4,9 @@
     <permission android:name="com.sahl.permission.UNION" android:label="Sahl apps" android:protectionLevel="signature" />
     <uses-permission android:name="com.sahl.permission.UNION" />
     <queries>
+        <package android:name="com.aly.sahlpdf" />
         <package android:name="com.sahl.pdf" />
+        <package android:name="com.sahl.home" />
         <package android:name="com.aly.trueqibla" />
         <package android:name="com.aly.sahlsync" />
         <package android:name="com.sahl.adhan" />
