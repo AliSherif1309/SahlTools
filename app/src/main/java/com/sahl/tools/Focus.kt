@@ -77,7 +77,7 @@ object Focus {
             enableVibration(true); vibrationPattern = longArrayOf(0, 400, 200, 400)
         })
         val open = PendingIntent.getActivity(c, 34, Intent(c, FocusActivity::class.java), PendingIntent.FLAG_IMMUTABLE)
-        nm.notify(35, Notification.Builder(c, "focus_alert").setSmallIcon(R.drawable.ic_focus)
+        nm.notify(35, SahlNotif.apply(c, Notification.Builder(c, "focus_alert"))
             .setContentTitle(title).setContentText(text).setContentIntent(open).setAutoCancel(true).build())
     }
 
@@ -129,7 +129,7 @@ object Focus {
         val nm = c.getSystemService(NotificationManager::class.java)
         nm.createNotificationChannel(NotificationChannel("focus", c.getString(R.string.fo_t), NotificationManager.IMPORTANCE_LOW))
         val open = PendingIntent.getActivity(c, 31, Intent(c, FocusActivity::class.java), PendingIntent.FLAG_IMMUTABLE)
-        nm.notify(31, Notification.Builder(c, "focus").setSmallIcon(R.drawable.ic_focus)
+        nm.notify(31, SahlNotif.apply(c, Notification.Builder(c, "focus"))
             .setContentTitle(c.getString(R.string.fo_running, activity(c)))
             .setWhen(running(c)).setUsesChronometer(true).setShowWhen(true).setOngoing(true).setContentIntent(open).build())
     }
