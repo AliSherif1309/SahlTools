@@ -1,18 +1,39 @@
-# Sahl Tools · سهل للأدوات
+<div align="center">
 
-Everyday phone tools in one small app, in the Sahl style (emerald & gold, Arabic/English, light/dark).
+<img src="docs/banner.svg" alt="Sahl Tools · سهل للأدوات" width="100%"/>
 
-| Tool | What it does | Quick Settings tile |
-|---|---|---|
-| Keep Screen On | Stops the screen from turning off; restores your timeout when off | ✓ |
-| Volume Lock | Locks media, ring, notification and alarm volume | ✓ |
-| Touch Lock | Blocks all touches; tap the lock 3 times to unlock | ✓ |
-| Floating Timer | Floating stopwatch or countdown over any app | ✓ |
+<br/><br/>
 
-Each tool has an **Add to Quick Settings** button (Android 13+), or add the tiles yourself from the Quick Settings edit screen.
+[![Download APK](https://img.shields.io/github/v/release/AliSherif1309/SahlTools?label=Download%20APK&color=0B5D4B&style=for-the-badge)](https://github.com/AliSherif1309/SahlTools/releases/latest)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/AliSherif1309/SahlTools/build.yml?label=Build&color=1E8A70&style=for-the-badge)](https://github.com/AliSherif1309/SahlTools/actions)
+![Bilingual](https://img.shields.io/badge/Language-Arabic%20%26%20English-D4AF37?style=for-the-badge)
+![Privacy](https://img.shields.io/badge/Privacy-Ad-Free-073D32?style=for-the-badge)
 
-## Install
-Download the latest APK from [Releases](../../releases/latest). The app tells you when a new version is out.
+</div>
 
-## Build
-Every push to `main` builds a signed APK with GitHub Actions and publishes it as a release.
+---
+
+## ✨ Highlights
+
+| Feature | What it gives you |
+|---|---|
+| 🎛️ **Quick Settings Tiles** | Keep Screen On, Volume Lock, Touch Lock, Floating Timer, Screen Dimmer, Torch, and Sound Mode. |
+| 🛡️ **Link Safety & Call Guard** | Checks tapped links before opening and blocks unwanted spam calls silently. |
+| 🔍 **Sahl Universal Search** | Search across Sahl Contacts, Phone, Messages, and Files from one place. |
+| 📶 **Network & App Tools** | Built-in speed test, data usage tracker, QR scanner, Wi-Fi sharing, and focus tools. |
+
+---
+
+## 📲 Install in Seconds
+
+1. Tap **[Download Latest APK](https://github.com/AliSherif1309/SahlTools/releases/latest)** above.
+2. Open the downloaded `.apk` file on your Android phone to install.
+3. **Sahl Tools** checks for new versions automatically so you stay up to date in one tap.
+
+---
+
+## 🌿 The Sahl Apps Family · عائلة تطبيقات سهل
+
+A calm, ad-free, bilingual (**Arabic & English**) suite of everyday Android apps crafted in **Emerald & Gold**:
+
+[🎨 Sahl Theme](https://github.com/AliSherif1309/SahlHome) · [🕌 Sahl Adhan](https://github.com/AliSherif1309/SahlAdhan) · [🧭 Sahl Qibla](https://github.com/AliSherif1309/SahlQibla) · [📞 Sahl Phone](https://github.com/AliSherif1309/SahlPhone) · [👤 Sahl Contacts](https://github.com/AliSherif1309/SahlContacts) · [💬 Sahl Messages](https://github.com/AliSherif1309/SahlMessages) · [📷 Sahl Camera](https://github.com/AliSherif1309/SahlCamera) · [🖼️ Sahl Gallery](https://github.com/AliSherif1309/SahlGallery) · [📁 Sahl Files](https://github.com/AliSherif1309/SahlFiles) · [📄 Sahl PDF](https://github.com/AliSherif1309/SahlPDF) · [☁️ Sahl Sync](https://github.com/AliSherif1309/SahlSync) · [📺 Sahl TV](https://github.com/AliSherif1309/SahlTV-Launcher)
