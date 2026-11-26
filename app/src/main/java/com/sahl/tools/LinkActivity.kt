@@ -64,30 +64,53 @@ class LinkActivity : Activity() {
         addView(result)
         val body = LinearLayout(this@LinkActivity).apply { orientation = LinearLayout.VERTICAL }
         addView(body)
+        fun render(clean: String, expandedFrom: String?) {
+            body.removeAllViews()
+            result.text = clean
+            result.setOnClickListener { openChecked(clean) }
+            val removed = url.length - clean.length
+            if (expandedFrom != null && expandedFrom != url) body.addView(label("↪  " + getString(R.string.was_short), 13f, R.color.sub))
+            if (clean != (expandedFrom ?: url)) body.addView(label("✂  " + getString(R.string.tracking_removed), 13f, R.color.sub))
+            else if (removed == 0) body.addView(label("✓  " + getString(R.string.already_clean), 13f, R.color.sub))
+            body.addView(row(sahlButton(getString(R.string.copy)) { copy(clean) },
+                sahlButton(getString(R.string.share)) { shareText(clean) },
+                sahlButton(getString(R.string.open)) { openChecked(clean) }))
+            safety(body, clean, autoScan) { fixed -> render(fixed, expandedFrom) }
+        }
         Thread {
             val expanded = try { LinkCleaner.expand(url) } catch (_: Exception) { url }
             val clean = LinkCleaner.clean(expanded)
-            runOnUiThread {
-                result.text = clean
-                result.setOnClickListener { openChecked(clean) }
-                val removed = url.length - clean.length
-                if (expanded != url) body.addView(label("↪  " + getString(R.string.was_short), 13f, R.color.sub))
-                if (clean != expanded) body.addView(label("✂  " + getString(R.string.tracking_removed), 13f, R.color.sub))
-                else if (removed == 0) body.addView(label("✓  " + getString(R.string.already_clean), 13f, R.color.sub))
-                body.addView(row(sahlButton(getString(R.string.copy)) { copy(clean) },
-                    sahlButton(getString(R.string.share)) { shareText(clean) },
-                    sahlButton(getString(R.string.open)) { openChecked(clean) }))
-                safety(body, clean, autoScan)
-            }
+            runOnUiThread { render(clean, expanded) }
         }.start()
     }
 
     /** Warning signs found on the phone, plus a VirusTotal scan. */
-    private fun safety(into: LinearLayout, url: String, autoScan: Boolean) {
+    private fun safety(into: LinearLayout, url: String, autoScan: Boolean, onFix: (String) -> Unit) {
         into.addView(label(getString(R.string.safety_t), 16f, R.color.emerald, true).apply { setPadding(0, dp(8), 0, 0) })
         val w = LinkSafety.warnings(url)
         if (w.isEmpty()) into.addView(label("✓  " + getString(R.string.ws_none), 14f))
-        else for (r in w) into.addView(label("⚠  " + getString(r), 14f).apply { setPadding(0, dp(2), 0, dp(2)) })
+        else for (r in w) {
+            into.addView(label("⚠  " + getString(r), 14f).apply { setPadding(0, dp(2), 0, dp(2)) })
+            LinkSafety.fixFor(r, url)?.let { fix ->
+                into.addView(sahlButton(getString(fix.labelId)) { onFix(fix.apply(url)) })
+            }
+            if (r == R.string.ws_short) {
+                val expandBtn = sahlButton(getString(R.string.ws_fix_expand)) {}
+                expandBtn.setOnClickListener {
+                    expandBtn.isEnabled = false
+                    Thread {
+                        val expanded = try { LinkCleaner.expand(url) } catch (_: Exception) { url }
+                        val clean = LinkCleaner.clean(expanded)
+                        runOnUiThread {
+                            expandBtn.isEnabled = true
+                            if (clean != url) onFix(clean)
+                            else android.widget.Toast.makeText(this, R.string.ws_expand_fail, android.widget.Toast.LENGTH_SHORT).show()
+                        }
+                    }.start()
+                }
+                into.addView(expandBtn)
+            }
+        }
         val vt = label("", 15f, bold = true).apply { setPadding(0, dp(6), 0, 0) }
         into.addView(vt)
         val scan = sahlButton(getString(R.string.vt_scan)) {}

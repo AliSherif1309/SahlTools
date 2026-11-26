@@ -27,6 +27,7 @@ class LinkPopupActivity : Activity() {
     private lateinit var steps: LinearLayout
     private lateinit var params: LinearLayout
     private lateinit var safetyBox: LinearLayout
+    private lateinit var warningsBox: LinearLayout
     private lateinit var vtView: TextView
     private lateinit var vtButtons: LinearLayout
 
@@ -70,9 +71,10 @@ class LinkPopupActivity : Activity() {
         steps = section(col, R.string.pop_steps)
         params = section(col, R.string.pop_tracking)
         safetyBox = section(col, R.string.safety_t)
+        warningsBox = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
         vtView = label("", 15f, bold = true)
         vtButtons = LinearLayout(this)
-        safetyBox.addView(vtView); safetyBox.addView(vtButtons)
+        safetyBox.addView(warningsBox); safetyBox.addView(vtView); safetyBox.addView(vtButtons)
 
         val actions = LinearLayout(this).apply { gravity = Gravity.CENTER; setPadding(0, dp(6), 0, 0) }
         actions.addView(action(getString(R.string.open), true) { LinkActivity.openInBrowser(this, current()) { finish() } })
@@ -187,16 +189,24 @@ class LinkPopupActivity : Activity() {
         }
     }
 
+    private fun applyUrl(newUrl: String) {
+        scanned = ""
+        show(newUrl)
+        safety()
+    }
+
     private fun safety() {
         val url = current()
         val w = LinkSafety.warnings(url)
-        val box = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
+        warningsBox.removeAllViews()
+        vtButtons.removeAllViews()
+        hostView.setTextColor(getColor(R.color.text))
         // Downloads (APK, EXE, ZIP …) get a big warning before anything opens
         val dl = label("", 15f, R.color.card, true).apply {
             visibility = View.GONE; setPadding(dp(12), dp(8), dp(12), dp(8))
             background = android.graphics.drawable.GradientDrawable().apply { cornerRadius = dp(12).toFloat(); setColor(0xFFC62828.toInt()) }
         }
-        box.addView(dl)
+        warningsBox.addView(dl)
         Thread {
             val kind = LinkSafety.download(url)
             if (kind != null) runOnUiThread {
@@ -205,9 +215,29 @@ class LinkPopupActivity : Activity() {
                 banner.text = "⬇  " + getString(R.string.dl_banner, kind)
             }
         }.start()
-        if (w.isEmpty()) box.addView(label("✓  " + getString(R.string.ws_none), 14f))
-        else for (r in w) box.addView(label("⚠  " + getString(r), 14f).apply { setTextColor(0xFFD08A00.toInt()) })
-        safetyBox.addView(box, 0)
+        if (w.isEmpty()) warningsBox.addView(label("✓  " + getString(R.string.ws_none), 14f))
+        else for (r in w) {
+            warningsBox.addView(label("⚠  " + getString(r), 14f).apply { setTextColor(0xFFD08A00.toInt()) })
+            LinkSafety.fixFor(r, url)?.let { fix ->
+                warningsBox.addView(sahlButton(getString(fix.labelId)) { applyUrl(fix.apply(current())) })
+            }
+            if (r == R.string.ws_short) {
+                val expandBtn = sahlButton(getString(R.string.ws_fix_expand)) {}
+                expandBtn.setOnClickListener {
+                    expandBtn.isEnabled = false
+                    val now = current()
+                    Thread {
+                        val hops = try { LinkCleaner.chain(now) } catch (_: Exception) { listOf(now) }
+                        runOnUiThread {
+                            expandBtn.isEnabled = true
+                            if (hops.last() != now) applyUrl(hops.last())
+                            else android.widget.Toast.makeText(this, R.string.ws_expand_fail, android.widget.Toast.LENGTH_SHORT).show()
+                        }
+                    }.start()
+                }
+                warningsBox.addView(expandBtn)
+            }
+        }
         vtButtons.addView(sahlButton(getString(R.string.vt_scan)) { scan() })
         vtButtons.addView(sahlButton(getString(R.string.vt_report)) { LinkActivity.openInBrowser(this, LinkSafety.vtReport(current())) })
         if (LinkSafety.key(this).isNotEmpty()) scan()
