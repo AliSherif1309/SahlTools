@@ -88,6 +88,11 @@
     <string name="ws_long">Unusually long or layered address</string>
     <string name="ws_short">Short link that could not be opened — the real address is hidden</string>
     <string name="ws_brand">Mentions a well-known brand, but isn\'t that brand\'s site — possible phishing</string>
+    <string name="ws_fix_https">Upgrade to HTTPS</string>
+    <string name="ws_fix_at">Remove fake prefix (@)</string>
+    <string name="ws_fix_ascii">Show real address (xn--)</string>
+    <string name="ws_fix_expand">Try expanding link</string>
+    <string name="ws_expand_fail">Could not expand this short link</string>
     <string name="vt_scan">Scan with VirusTotal</string>
     <string name="vt_site">Open on VirusTotal</string>
     <string name="vt_scanning">Scanning with ~90 antivirus engines…</string>

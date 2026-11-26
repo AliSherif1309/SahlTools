@@ -88,6 +88,11 @@
     <string name="ws_long">عنوان طويل أو متعدد الطبقات بشكل غير معتاد</string>
     <string name="ws_short">رابط مختصر لم يُفتح — العنوان الحقيقي مخفي</string>
     <string name="ws_brand">يذكر علامة تجارية معروفة لكنه ليس موقعها — احتمال تصيّد</string>
+    <string name="ws_fix_https">الترقية إلى HTTPS</string>
+    <string name="ws_fix_at">إزالة الجزء المضلّل قبل @</string>
+    <string name="ws_fix_ascii">إظهار العنوان الحقيقي (xn--)</string>
+    <string name="ws_fix_expand">محاولة كشف الرابط</string>
+    <string name="ws_expand_fail">تعذّر كشف هذا الرابط المختصر</string>
     <string name="vt_scan">افحص عبر VirusTotal</string>
     <string name="vt_site">افتح في VirusTotal</string>
     <string name="vt_scanning">جارٍ الفحص بحوالي ٩٠ برنامج مكافحة فيروسات…</string>

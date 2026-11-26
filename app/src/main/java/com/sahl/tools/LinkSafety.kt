@@ -44,6 +44,27 @@ object LinkSafety {
         return w
     }
 
+    data class Fix(val warningId: Int, val labelId: Int, val apply: (String) -> String)
+
+    /** Available one-tap fix for a warning sign on this URL, or null if none applies. */
+    fun fixFor(warningId: Int, url: String): Fix? = when (warningId) {
+        R.string.ws_http -> if (url.startsWith("http://", ignoreCase = true))
+            Fix(warningId, R.string.ws_fix_https) { "https://" + it.substring(7) } else null
+        R.string.ws_at -> {
+            val cleaned = url.replaceFirst(Regex("^(https?://)[^/?#]*@", RegexOption.IGNORE_CASE), "$1")
+            if (cleaned != url) Fix(warningId, R.string.ws_fix_at) {
+                it.replaceFirst(Regex("^(https?://)[^/?#]*@", RegexOption.IGNORE_CASE), "$1")
+            } else null
+        }
+        R.string.ws_lookalike -> {
+            val host = Uri.parse(url).host
+            val ascii = host?.let { runCatching { IDN.toASCII(it) }.getOrNull() }
+            if (host != null && ascii != null && ascii != host)
+                Fix(warningId, R.string.ws_fix_ascii) { it.replaceFirst(host, ascii) } else null
+        }
+        else -> null
+    }
+
     private val fileTypes = mapOf(
         "apk" to "Android app (APK)", "apks" to "Android app (APK)", "xapk" to "Android app (APK)", "aab" to "Android app",
         "exe" to "Windows program", "msi" to "Windows installer", "bat" to "Windows script", "scr" to "Windows program",
