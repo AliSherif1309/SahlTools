@@ -5,6 +5,8 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.net.Uri
+import android.os.Handler
+import android.os.Looper
 import android.view.Gravity
 import android.view.View
 import android.widget.FrameLayout
@@ -12,11 +14,15 @@ import android.widget.HorizontalScrollView
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
+import org.json.JSONObject
+import java.net.HttpURLConnection
+import java.net.URL
 
 /**
  * Shows all Sahl Union apps inside Settings:
  *  - Installed apps show their real icon and open on tap.
- *  - Uninstalled apps show a Sahl emerald & gold install badge (⬇) and open their GitHub Releases page to install.
+ *  - Uninstalled apps show a Sahl emerald & gold install badge (⬇) and directly download the latest APK.
  */
 object SahlUnionApps {
     private data class UnionApp(
@@ -34,7 +40,7 @@ object SahlUnionApps {
         UnionApp(listOf("com.sahl.gallery"), "Gallery", "المعرض", "SahlGallery"),
         UnionApp(listOf("com.sahl.files"), "Files", "الملفات", "SahlFiles"),
         UnionApp(listOf("com.sahl.adhan"), "Adhan", "الأذان", "SahlAdhan"),
-        UnionApp(listOf("com.sahl.qibla", "com.aly.trueqibla"), "Qibla", "القبلة", "TrueQibla-Android"),
+        UnionApp(listOf("com.sahl.qibla", "com.aly.trueqibla"), "Qibla", "القبلة", "SahlQibla"),
         UnionApp(listOf("com.sahl.tools"), "Tools", "الأدوات", "SahlTools"),
         UnionApp(listOf("com.aly.sahlsync"), "Sync", "المزامنة", "SahlSync"),
         UnionApp(listOf("com.aly.sahlpdf", "com.sahl.pdf"), "PDF", "PDF", "SahlPDF"),
@@ -73,10 +79,7 @@ object SahlUnionApps {
                     if (installedPkg != null) {
                         try { pm.getLaunchIntentForPackage(installedPkg)?.let { c.startActivity(it) } } catch (_: Exception) { }
                     } else {
-                        try {
-                            val url = "https://github.com/AliSherif1309/${app.repo}/releases/latest"
-                            c.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-                        } catch (_: Exception) { }
+                        openLatestApk(c, app, ar)
                     }
                 }
             }
@@ -123,5 +126,50 @@ object SahlUnionApps {
             isHorizontalScrollBarEnabled = false
             addView(row)
         }
+    }
+
+    private fun openLatestApk(c: Context, app: UnionApp, ar: Boolean) {
+        val appCtx = c.applicationContext
+        Toast.makeText(
+            appCtx,
+            if (ar) "جاري تحميل ${app.ar}..." else "Downloading Sahl ${app.en}...",
+            Toast.LENGTH_SHORT
+        ).show()
+
+        Thread {
+            val fallback = "https://github.com/AliSherif1309/${app.repo}/releases/latest"
+            val target = try {
+                val con = (URL("https://api.github.com/repos/AliSherif1309/${app.repo}/releases/latest").openConnection() as HttpURLConnection).apply {
+                    connectTimeout = 5000
+                    readTimeout = 5000
+                    setRequestProperty("User-Agent", "SahlUnion")
+                    setRequestProperty("Accept", "application/vnd.github+json")
+                }
+                if (con.responseCode in 200..299) {
+                    val body = con.inputStream.bufferedReader().readText()
+                    val assets = JSONObject(body).optJSONArray("assets")
+                    var apkUrl: String? = null
+                    if (assets != null) {
+                        for (i in 0 until assets.length()) {
+                            val a = assets.getJSONObject(i)
+                            val name = a.optString("name", "")
+                            if (name.endsWith(".apk", ignoreCase = true)) {
+                                apkUrl = a.optString("browser_download_url", "").takeIf { it.isNotEmpty() }
+                                break
+                            }
+                        }
+                    }
+                    apkUrl ?: fallback
+                } else fallback
+            } catch (_: Exception) {
+                fallback
+            }
+
+            Handler(Looper.getMainLooper()).post {
+                try {
+                    appCtx.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(target)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+                } catch (_: Exception) { }
+            }
+        }.start()
     }
 }
